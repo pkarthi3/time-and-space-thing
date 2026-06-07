@@ -1,0 +1,7 @@
+- assets.forestbg.jpg: by Takeshi Ishikawa on Vecteezy, used under Vecteezy's Free License (https://www.vecteezy.com/vector-art/59361951-seamless-forest-landscape-at-night-background-illustration-horizontally-repeatable)
+- assets/itemfound.wav: by BeezleFM on freesound.org, used under Attribution 4.0 (https://freesound.org/people/BeezleFM/sounds/512138/)
+- assets/levelbg.wav: by FoolBoyMedia on freesound.org, used under Attribution NonCommercial 4.0 (https://freesound.org/people/FoolBoyMedia/sounds/264295/)
+- assets/menubg.wav: by rhodesmas on freesound.org, used under Attribution 4.0 (https://freesound.org/people/rhodesmas/sounds/324252/)
+- assets/nextarea.flac: by qubodup on freesound.org, used under Creative Commons 0 (https://freesound.org/people/qubodup/sounds/856641/)
+- assets/sillyguy.png: created by Pavithra Karthikeyan in Krita
+- assets/sillytextnew.png: created by Pavithra Karthikeyan in Krita
