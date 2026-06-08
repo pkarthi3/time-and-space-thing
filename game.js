@@ -5,7 +5,9 @@ class Logo extends Phaser.Scene {
         super('logo');
     }
     preload() {
-        
+        this.load.path = "assets/";
+        this.load.image('guy', 'sillyguy.png');
+        this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
         this.sillyguy = this.add.image(400, 200, "guy");
