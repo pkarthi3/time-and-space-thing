@@ -10,6 +10,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
+        this.scene.start('introlevel1');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -46,10 +47,15 @@ class Menu extends Phaser.Scene {
         this.load.path = 'assets/';
         this.load.image('forest', 'forestbg.jpg');
         this.load.image('logo', 'gamelogo.png');
+        this.load.audio('menumusic', 'menubg.wav');
     }
     create() {
         this.menubg = this.add.image(400, 300, 'forest');
         this.menubg.setScale(1.1);
+
+        this.menubg = this.sound.add('menumusic');
+        this.menubg.play();
+
         this.logo = this.add.image(550, 150, "logo");
         this.logo.setScale(0.4);
         this.sideRect = this.add.rectangle(-400, 300, 400, 600, 0x447182, 1);
@@ -103,6 +109,7 @@ class Menu extends Phaser.Scene {
             });
         })
         this.button1.on("pointerdown", () => {
+            this.menubg.pause();
             if (viewedOpening == false) {
                 this.scene.start('intro');
             }
@@ -262,17 +269,103 @@ class Intro extends Phaser.Scene {
     update() {}
 }
 
+class Button extends Phaser.GameObjects.Text {
+     constructor(scene, x, y, text) {
+        super(scene, x, y, text);
+        this.setFontSize(50);
+        this.setInteractive();
+     }       
+}
+
+class PastItem extends Phaser.GameObjects.Image {
+    constructor(scene, x, y, texture, description) {
+        super(scene, x, y, texture);
+        this.description = description;
+        scene.physics.world.enable(this);
+        this.body.allowGravity = false;
+        this.body.setImmovable(true);
+        this.found = false;
+        scene.totalItems++;
+    }
+}
+
+
 class IntroLevel1 extends Phaser.Scene {
     constructor() {
         super('introlevel1');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); //will be replaced with actual main character in final game
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('forest', 'forestbg.jpg');
+        
+    }
     create() {
-        this.add.text(100, 100, "intro to game world/controls, no real gameplay (press 1 to continue)");
-        this.settings = this.add.text(500, 300, "settings");
-        this.settings.setInteractive();
+        this.totalItems = 0;
+        this.itemsFound = 0;
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+        this.bgm = this.sound.add('levelbgm');
+        this.bgm.setLoop(true);
+        if (this.bgm.isPaused == true) {
+            this.sound.resume('levelbgm');
+        }
+        else {
+            this.bgm.play();
+        }
+
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.035);
+        this.player.setCollideWorldBounds(true);
+
+        this.leveldesc = this.add.text(100, 50, "Doing this always puts my mind at ease...");
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 0,
+            duration: 3000,
+        });
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.leftButton = this.add.existing(new Button(this, 50, 500, "<"));
+        this.leftButton.on("pointerdown", () => {
+            this.player.setVelocityX(-150);
+            //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
+            this.player.flipX = true;
+        })
+        this.leftButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.upButton = this.add.existing(new Button(this, 650, 500, "^"));
+        this.upButton.on("pointerdown", () => {
+            this.player.setVelocityY(-250);
+        });
+
+        this.rightButton = this.add.existing(new Button(this, 150, 500, ">"));
+        this.rightButton.on("pointerdown", () => {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        })
+        this.rightButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+
+        this.physics.add.collider(this.player, this.ground);
+        this.settings = this.add.existing(new Button(this, 500, 0, "settings"));
         this.settings.on('pointerdown', () => {
+            this.bgm.pause();
             this.scene.sleep(this.key);
             this.scene.start('settingsingame', {prevKey: 'introlevel1'});
         })
@@ -280,7 +373,32 @@ class IntroLevel1 extends Phaser.Scene {
            this.scene.start('introlevel2');
         })
     }
-    update() {}
+    update() {
+        // based off example at https://labs.phaser.io/phaser4-view.html?src=src%5Cphysics%5Carcade%5Cbody%20on%20a%20path.js&return=phaser4-index.html%3Fpath%3Dphysics%252Farcade
+        const { left, right, up } = this.cursors;
+        if (left.isDown) {
+            this.player.setVelocityX(-150);
+            this.player.flipX = true;
+        }
+        else if (right.isDown) {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        }
+
+        left.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+        right.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+        if (up.isDown && this.player.body.touching.down) {
+            this.player.setVelocityY(-250);
+        }
+    
+    }
 
 }
 
@@ -443,6 +561,13 @@ let config = {
     width: 800,
     height: 600,
     backgroundColor: 0x000000,
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 300 },
+            debug: true,
+        }
+    },
     scene: [Logo, Menu, Settings, SettingsIngame, Credits, Intro, IntroLevel1, IntroLevel2, IntroLevel3, MainLevel1, MainLevel2, MainLevel3, FinalLevel, Ending1, Ending2],
 }
 

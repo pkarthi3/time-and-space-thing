@@ -6,3 +6,6 @@
 - assets/sillyguy.png: created by Pavithra Karthikeyan in Krita
 - assets/sillytextnew.png: created by Pavithra Karthikeyan in Krita
 - assets/gamelogo.png: created by Pavithra Karthikeyan in Krita, uses font Kumar One by Indian Type Foundry found on Google Fonts (https://fonts.google.com/specimen/Kumar+One)
+- assets/objects: all images in the folder created by Pavithra Karthikeyan in IbisPaintX
+- assets/player.png: created by Pavithra Karthikeyan in IbisPaintX
+- assets/ground.png: created by Pavithra Karthikeyan in Krita
