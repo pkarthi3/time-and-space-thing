@@ -5,3 +5,4 @@
 - assets/nextarea.flac: by qubodup on freesound.org, used under Creative Commons 0 (https://freesound.org/people/qubodup/sounds/856641/)
 - assets/sillyguy.png: created by Pavithra Karthikeyan in Krita
 - assets/sillytextnew.png: created by Pavithra Karthikeyan in Krita
+- assets/gamelogo.png: created by Pavithra Karthikeyan in Krita, uses font Kumar One by Indian Type Foundry found on Google Fonts (https://fonts.google.com/specimen/Kumar+One)

@@ -42,32 +42,169 @@ class Menu extends Phaser.Scene {
     constructor() {
         super('menu');
     }
-    preload() {}
+    preload() {
+        this.load.path = 'assets/';
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.image('logo', 'gamelogo.png');
+    }
     create() {
-        this.add.text(400, 100, "A Not So Distant Past");
-        
-        this.gameStart = this.add.text(100, 100, "start");
-        this.gameStart.setInteractive();
-        this.gameStart.on("pointerdown", () => {
-            if (viewedOpening = false) {
+        this.menubg = this.add.image(400, 300, 'forest');
+        this.menubg.setScale(1.1);
+        this.logo = this.add.image(550, 150, "logo");
+        this.logo.setScale(0.4);
+        this.sideRect = this.add.rectangle(-400, 300, 400, 600, 0x4DA171, 1);
+        this.tweens.add({
+            targets: this.sideRect,
+            x: 100,
+            duration: 500,
+        })
+
+        this.button1 = this.add.rectangle(150, 100, 200, 50, 0x7FC99E);
+        this.button1.setAlpha(0);
+        this.label1 = this.add.text(100, 100, "Play Game");
+        this.label1.setAlpha(0);
+        this.tweens.add({
+            targets: [this.button1, this.label1],
+            alpha: 0.7,
+            duration: 500,
+            delay: 1000,
+        });
+        this.button1.setInteractive();
+        this.button1.on("pointerover", () => {
+            this.button1.setFillStyle(0x4BB477);
+            this.tweens.chain({
+                targets: [this.button1, this.label1],
+                tweens: [
+                    {
+                        scale: 1.1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 1,
+                        duration: 250,
+                    }
+                ]
+            });
+        });
+        this.button1.on("pointerout", () => {
+            this.button1.setFillStyle(0x7FC99E);
+            this.tweens.chain({
+                targets: [this.button1, this.label1],
+                tweens: [
+                    {
+                        scale: 1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 0.7,
+                        duration: 250,
+                    }
+                ]
+            });
+        })
+        this.button1.on("pointerdown", () => {
+            if (viewedOpening == false) {
                 this.scene.start('intro');
             }
             else {
                 this.scene.start('introlevel1');
             }
-        });
+        })
 
-        this.gameSettings = this.add.text(100, 300, "settings");
-        this.gameSettings.setInteractive();
-        this.gameSettings.on("pointerdown", () => {
+        this.button2 = this.add.rectangle(150, 300, 200, 50, 0x7FC99E);
+        this.label2 = this.add.text(100, 300, "Settings");
+        this.button2.setAlpha(0);
+        this.label2.setAlpha(0);
+        this.tweens.add({
+            targets: [this.button2, this.label2],
+            alpha: 0.7,
+            duration: 500,
+            delay: 2000,
+        });
+        this.button2.setInteractive();
+        this.button2.on("pointerover", () => {
+            this.button2.setFillStyle(0x4BB477);
+            this.tweens.chain({
+                targets: [this.button2, this.label2],
+                tweens: [
+                    {
+                        scale: 1.1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 1,
+                        duration: 250,
+                    }
+                ]
+            });
+        })
+        this.button2.on("pointerout", () => {
+            this.button2.setFillStyle(0x7FC99E);
+            this.tweens.chain({
+                targets: [this.button2, this.label2],
+                tweens: [
+                    {
+                        scale: 1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 0.7,
+                        duration: 250,
+                    }
+                ]
+            });
+        })
+        this.button2.on("pointerdown", () => {
             this.scene.start('settings');
         });
 
-        this.gameCredits = this.add.text(100, 500, "credits");
-        this.gameCredits.setInteractive();
-        this.gameCredits.on("pointerdown", () => {
-            this.scene.start('credits');
+        this.button3 = this.add.rectangle(150, 500, 200, 50, 0x7FC99E);
+        this.label3 = this.add.text(100, 500, "Credits");
+        this.button3.setAlpha(0);
+        this.label3.setAlpha(0);
+        this.tweens.add({
+            targets: [this.button3, this.label3],
+            alpha: 0.7,
+            duration: 500,
+            delay: 3000,
         });
+        this.button3.setInteractive();
+        this.button3.on("pointerover", () => {
+            this.button3.setFillStyle(0x4BB477);
+             this.tweens.chain({
+                targets: [this.button3, this.label3],
+                tweens: [
+                    {
+                        scale: 1.1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 1,
+                        duration: 250,
+                    }
+                ]
+            });
+        })
+        this.button3.on("pointerout", () => {
+            this.button3.setFillStyle(0x7FC99E);
+            this.tweens.chain({
+                targets: [this.button3, this.label3],
+                tweens: [
+                    {
+                        scale: 1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 0.7,
+                        duration: 250,
+                    }
+                ]
+            });
+        });
+        this.button3.on('pointerdown', () => {
+            this.scene.start('credits');
+        })
+
 
     }
     update() {}
@@ -114,10 +251,10 @@ class Intro extends Phaser.Scene {
 
     preload() {}
     create() {
+        viewedOpening = true;
         this.add.text(100, 100, "opening cinematic");
         this.add.text(100, 200, "main character discusses current disconnect from life");
         this.add.text(100, 300, "ends with main character walking into forest");
-        // viewedOpening = true;
         this.input.once("pointerdown", () => {
            this.scene.start('introlevel1');
         })
