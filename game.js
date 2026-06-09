@@ -52,14 +52,14 @@ class Menu extends Phaser.Scene {
         this.menubg.setScale(1.1);
         this.logo = this.add.image(550, 150, "logo");
         this.logo.setScale(0.4);
-        this.sideRect = this.add.rectangle(-400, 300, 400, 600, 0x4DA171, 1);
+        this.sideRect = this.add.rectangle(-400, 300, 400, 600, 0x447182, 1);
         this.tweens.add({
             targets: this.sideRect,
             x: 100,
             duration: 500,
         })
 
-        this.button1 = this.add.rectangle(150, 100, 200, 50, 0x7FC99E);
+        this.button1 = this.add.rectangle(150, 100, 200, 50, 0x94B9C7);
         this.button1.setAlpha(0);
         this.label1 = this.add.text(100, 100, "Play Game");
         this.label1.setAlpha(0);
@@ -71,7 +71,7 @@ class Menu extends Phaser.Scene {
         });
         this.button1.setInteractive();
         this.button1.on("pointerover", () => {
-            this.button1.setFillStyle(0x4BB477);
+            this.button1.setFillStyle(0x5892A7);
             this.tweens.chain({
                 targets: [this.button1, this.label1],
                 tweens: [
@@ -87,7 +87,7 @@ class Menu extends Phaser.Scene {
             });
         });
         this.button1.on("pointerout", () => {
-            this.button1.setFillStyle(0x7FC99E);
+            this.button1.setFillStyle(0x94B9C7);
             this.tweens.chain({
                 targets: [this.button1, this.label1],
                 tweens: [
@@ -111,7 +111,7 @@ class Menu extends Phaser.Scene {
             }
         })
 
-        this.button2 = this.add.rectangle(150, 300, 200, 50, 0x7FC99E);
+        this.button2 = this.add.rectangle(150, 300, 200, 50, 0x94B9C7);
         this.label2 = this.add.text(100, 300, "Settings");
         this.button2.setAlpha(0);
         this.label2.setAlpha(0);
@@ -123,7 +123,7 @@ class Menu extends Phaser.Scene {
         });
         this.button2.setInteractive();
         this.button2.on("pointerover", () => {
-            this.button2.setFillStyle(0x4BB477);
+            this.button2.setFillStyle(0x5892A7);
             this.tweens.chain({
                 targets: [this.button2, this.label2],
                 tweens: [
@@ -139,7 +139,7 @@ class Menu extends Phaser.Scene {
             });
         })
         this.button2.on("pointerout", () => {
-            this.button2.setFillStyle(0x7FC99E);
+            this.button2.setFillStyle(0x94B9C7);
             this.tweens.chain({
                 targets: [this.button2, this.label2],
                 tweens: [
@@ -158,7 +158,7 @@ class Menu extends Phaser.Scene {
             this.scene.start('settings');
         });
 
-        this.button3 = this.add.rectangle(150, 500, 200, 50, 0x7FC99E);
+        this.button3 = this.add.rectangle(150, 500, 200, 50, 0x94B9C7);
         this.label3 = this.add.text(100, 500, "Credits");
         this.button3.setAlpha(0);
         this.label3.setAlpha(0);
@@ -170,7 +170,7 @@ class Menu extends Phaser.Scene {
         });
         this.button3.setInteractive();
         this.button3.on("pointerover", () => {
-            this.button3.setFillStyle(0x4BB477);
+            this.button3.setFillStyle(0x5892A7);
              this.tweens.chain({
                 targets: [this.button3, this.label3],
                 tweens: [
@@ -186,7 +186,7 @@ class Menu extends Phaser.Scene {
             });
         })
         this.button3.on("pointerout", () => {
-            this.button3.setFillStyle(0x7FC99E);
+            this.button3.setFillStyle(0x94B9C7);
             this.tweens.chain({
                 targets: [this.button3, this.label3],
                 tweens: [
