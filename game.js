@@ -256,13 +256,16 @@ class Intro extends Phaser.Scene {
         super('intro');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.video('introcutscene', 'introcutscene.mp4');
+    }
     create() {
         viewedOpening = true;
-        this.add.text(100, 100, "opening cinematic");
-        this.add.text(100, 200, "main character discusses current disconnect from life");
-        this.add.text(100, 300, "ends with main character walking into forest");
-        this.input.once("pointerdown", () => {
+        this.introVideo = this.add.video(400, 300, 'introcutscene');
+        this.introVideo.setScale(0.7);
+        this.introVideo.play();
+        this.time.delayedCall(17000, () => {
            this.scene.start('introlevel1');
         })
     }
@@ -304,6 +307,7 @@ class IntroLevel1 extends Phaser.Scene {
         
     }
     create() {
+        this.cameras.main.fadeIn();
         this.totalItems = 0;
         this.itemsFound = 0;
 
@@ -372,6 +376,8 @@ class IntroLevel1 extends Phaser.Scene {
         this.input.keyboard.on("keydown-ONE", () => {
            this.scene.start('introlevel2');
         })
+
+        
     }
     update() {
         // based off example at https://labs.phaser.io/phaser4-view.html?src=src%5Cphysics%5Carcade%5Cbody%20on%20a%20path.js&return=phaser4-index.html%3Fpath%3Dphysics%252Farcade
@@ -396,6 +402,10 @@ class IntroLevel1 extends Phaser.Scene {
 
         if (up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-250);
+        }
+
+        if (this.player.x > 750) {
+            this.scene.start('introlevel2');
         }
     
     }
