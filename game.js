@@ -1,4 +1,6 @@
 let viewedOpening = false;
+let muteMusic = false;
+let muteSFX = false;
 
 class Logo extends Phaser.Scene {
     constructor() {
@@ -53,8 +55,15 @@ class Menu extends Phaser.Scene {
         this.menubg = this.add.image(400, 300, 'forest');
         this.menubg.setScale(1.1);
 
-        this.menubg = this.sound.add('menumusic');
-        this.menubg.play();
+        this.menumusic = this.sound.add('menumusic');
+        if (this.menumusic.isPlaying == false){
+            if(this.menumusic.isPaused == true){
+                this.menumusic.resume();
+            }
+            else {
+                this.menumusic.play();
+            }
+        }
 
         this.logo = this.add.image(550, 150, "logo");
         this.logo.setScale(0.4);
@@ -109,7 +118,7 @@ class Menu extends Phaser.Scene {
             });
         })
         this.button1.on("pointerdown", () => {
-            this.menubg.pause();
+            this.menumusic.pause();
             if (viewedOpening == false) {
                 this.scene.start('intro');
             }
@@ -162,6 +171,7 @@ class Menu extends Phaser.Scene {
             });
         })
         this.button2.on("pointerdown", () => {
+            this.menumusic.pause();
             this.scene.start('settings');
         });
 
@@ -209,6 +219,7 @@ class Menu extends Phaser.Scene {
             });
         });
         this.button3.on('pointerdown', () => {
+            this.menumusic.pause();
             this.scene.start('credits');
         })
 
@@ -224,7 +235,18 @@ class Settings extends Phaser.Scene {
 
     preload() {}
     create() {
+        this.add.rectangle(400, 300, 800, 600, 0x447182);
         this.add.text(100, 100, "music/sfx volume settings");
+        this.fsbutton = this.add.existing(new MenuButton(this, 200, 300));
+        this.fsbutton.on('pointerdown', () => {
+            if(this.scale.isFullscreen) {
+                this.scale.stopFullscreen();
+            }
+            else {
+                this.scale.startFullscreen();
+            }
+        })
+        this.fslabel = this.add.text(150, 300, 'fullscreen');
         this.toMenu = this.add.text(100, 500, "back");
         this.toMenu.setInteractive();
         this.toMenu.on('pointerdown', () => {
@@ -241,10 +263,11 @@ class Credits extends Phaser.Scene {
 
     preload() {}
     create() {
-        this.add.text(100, 100, "credits go here");
+        this.add.rectangle(400, 300, 800, 600, 0x447182);
+        this.add.text(150, 100, "credits go here");
+        this.menuButton = this.add.existing(new MenuButton(this, 175, 500));
         this.toMenu = this.add.text(100, 500, "back");
-        this.toMenu.setInteractive();
-        this.toMenu.on('pointerdown', () => {
+        this.menuButton.on('pointerdown', () => {
             this.scene.start('menu');
         });
     }
@@ -292,6 +315,46 @@ class PastItem extends Phaser.GameObjects.Image {
     }
 }
 
+class MenuButton extends Phaser.GameObjects.Rectangle {
+    constructor(scene, x, y) {
+        super(scene, x, y, 200, 50, 0x94B9C7);
+        this.setAlpha(0.7);
+        this.setInteractive();
+        this.on("pointerover", () => {
+            this.setFillStyle(0x5892A7);
+            scene.tweens.chain({
+                targets: this,
+                tweens: [
+                    {
+                        scale: 1.1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 1,
+                        duration: 250,
+                    }
+                ]
+            });
+        })
+        
+        this.on("pointerout", () => {
+            this.setFillStyle(0x94B9C7);
+            scene.tweens.chain({
+                targets: [this, this.label],
+                tweens: [
+                    {
+                        scale: 1,
+                        duration: 250,
+                    }, 
+                    {
+                        alpha: 0.7,
+                        duration: 250,
+                    }
+                ]
+            });
+        });
+    }
+}
 
 class IntroLevel1 extends Phaser.Scene {
     constructor() {
@@ -300,7 +363,7 @@ class IntroLevel1 extends Phaser.Scene {
 
     preload() {
         this.load.path = "assets/";
-        this.load.image("player", "player.png"); //will be replaced with actual main character in final game
+        this.load.image("player", "player.png"); 
         this.load.image("ground", "ground.png");
         this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
@@ -373,9 +436,6 @@ class IntroLevel1 extends Phaser.Scene {
             this.scene.sleep(this.key);
             this.scene.start('settingsingame', {prevKey: 'introlevel1'});
         })
-        this.input.keyboard.on("keydown-ONE", () => {
-           this.scene.start('introlevel2');
-        })
 
         
     }
@@ -421,6 +481,7 @@ class SettingsIngame extends Phaser.Scene {
     }
     preload() {}
     create() {
+        this.add.rectangle(400, 300, 800, 600, 0x447182);
         this.add.text(100, 100, "settings go here");
 
         this.back = this.add.text(500, 500, "back");
@@ -435,6 +496,17 @@ class SettingsIngame extends Phaser.Scene {
         this.toMenu.on('pointerdown', () => {
             this.scene.start('menu');
         });
+
+        this.fsbutton = this.add.existing(new MenuButton(this, 200, 300));
+        this.fsbutton.on('pointerdown', () => {
+            if(this.scale.isFullscreen) {
+                this.scale.stopFullscreen();
+            }
+            else {
+                this.scale.startFullscreen();
+            }
+        })
+        this.fslabel = this.add.text(150, 300, 'fullscreen');
     }
     
 }
@@ -444,14 +516,118 @@ class IntroLevel2 extends Phaser.Scene {
         super('introlevel2');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("doodle", "objects/doodle.png");
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.audio('itemFound', 'itemfound.wav');
+        
+    }
     create() {
-        this.add.text(50, 100, "slight visual differences from previous due to being in the past, \n no real gameplay");
-        this.input.once("pointerdown", () => {
-           this.scene.start('introlevel3');
+        this.totalItems = 0;
+        this.itemsFound = 0;
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.035);
+        this.player.setCollideWorldBounds(true);
+
+        this.leveldesc = this.add.text(100, 50, "\"Maybe I'm too at ease... Did I maybe wander into the wrong parts of the forest?\"", {wordWrap: {width: 600}});
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 0,
+            duration: 3000,
+        });
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.leftButton = this.add.existing(new Button(this, 50, 500, "<"));
+        this.leftButton.on("pointerdown", () => {
+            this.player.setVelocityX(-150);
+            //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
+            this.player.flipX = true;
+        })
+        this.leftButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.doodle = this.add.existing(new PastItem(this, 400, 400, 'doodle', 'An old doodle from a few years ago of a somewhat familiar character. How did that get here?'));
+        this.doodle.setScale(0.05);
+
+        this.upButton = this.add.existing(new Button(this, 650, 500, "^"));
+        this.upButton.on("pointerdown", () => {
+            this.player.setVelocityY(-250);
+        });
+
+        this.rightButton = this.add.existing(new Button(this, 150, 500, ">"));
+        this.rightButton.on("pointerdown", () => {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        })
+        this.rightButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.physics.add.overlap(this.player, this.doodle, () => {
+            if (this.doodle.found == false) {
+                this.doodle.found = true;
+                this.itemsFound++;
+                this.sound.play('itemFound');
+            }
+            this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
+            this.tweens.add({
+                targets: this.itemdesc,
+                alpha: 0,
+                duration: 3000,
+                delay: 1000,
+            });
+        });
+
+        this.physics.add.collider(this.player, this.ground);
+        this.settings = this.add.existing(new Button(this, 500, 0, "settings"));
+        this.settings.on('pointerdown', () => {
+            this.bgm.pause();
+            this.scene.sleep(this.key);
+            this.scene.start('settingsingame', {prevKey: 'introlevel2'});
         })
     }
-    update() {}
+    update() {
+        const { left, right, up } = this.cursors;
+        if (left.isDown) {
+            this.player.setVelocityX(-150);
+            this.player.flipX = true;
+        }
+        else if (right.isDown) {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        }
+
+        left.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+        right.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+        if (up.isDown && this.player.body.touching.down) {
+            this.player.setVelocityY(-250);
+        }
+
+        if (this.player.x > 750) {
+            this.scene.start('introlevel3');
+        }
+    }
 
 }
 
@@ -571,6 +747,12 @@ let config = {
     width: 800,
     height: 600,
     backgroundColor: 0x000000,
+    //based on example solution at https://labs.phaser.io/phaser4-view.html?src=src%5Cscalemanager%5Cfull%20screen%20game.js&return=phaser4-index.html%3Fpath%3Drenderer
+    scale: {
+        mode: Phaser.Scale.FIT,
+        parent: 'phaser-example',
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     physics: {
         default: 'arcade',
         arcade: {
