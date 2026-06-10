@@ -1,5 +1,5 @@
 let viewedOpening = false;
-let muteMusic = false;
+let muteMusic = true;
 let muteSFX = false;
 
 class Logo extends Phaser.Scene {
@@ -56,15 +56,19 @@ class Menu extends Phaser.Scene {
         this.menubg.setScale(1.1);
 
         this.menumusic = this.sound.add('menumusic');
-        if (this.menumusic.isPlaying == false){
-            if(this.menumusic.isPaused == true){
-                this.menumusic.resume();
-            }
-            else {
-                this.menumusic.play();
+        if (muteMusic){
+            this.menumusic.setMute();
+        }
+        else {
+            if (this.menumusic.isPlaying == false){
+                if(this.menumusic.isPaused == true){
+                    this.menumusic.resume();
+                }
+                else {
+                    this.menumusic.play();
+                }
             }
         }
-
         this.logo = this.add.image(550, 150, "logo");
         this.logo.setScale(0.4);
         this.sideRect = this.add.rectangle(-400, 300, 400, 600, 0x447182, 1);
@@ -236,7 +240,6 @@ class Settings extends Phaser.Scene {
     preload() {}
     create() {
         this.add.rectangle(400, 300, 800, 600, 0x447182);
-        this.add.text(100, 100, "music/sfx volume settings");
         this.fsbutton = this.add.existing(new MenuButton(this, 200, 300));
         this.fsbutton.on('pointerdown', () => {
             if(this.scale.isFullscreen) {
@@ -247,6 +250,15 @@ class Settings extends Phaser.Scene {
             }
         })
         this.fslabel = this.add.text(150, 300, 'fullscreen');
+
+        this.mutebutton = this.add.existing(new MenuButton(this, 200, 100));
+        this.mutebutton.on('pointerdown', () => {
+            muteMusic = true;
+        });
+        this.add.text(100, 100, "mute music?");
+
+        this.fslabel = this.add.text(150, 300, 'fullscreen');
+
         this.toMenu = this.add.text(100, 500, "back");
         this.toMenu.setInteractive();
         this.toMenu.on('pointerdown', () => {
@@ -376,14 +388,20 @@ class IntroLevel1 extends Phaser.Scene {
 
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
+        
 
         this.bgm = this.sound.add('levelbgm');
         this.bgm.setLoop(true);
-        if (this.bgm.isPaused == true) {
-            this.sound.resume('levelbgm');
+        if (muteMusic == true){
+            this.bgm.setMute();
         }
         else {
-            this.bgm.play();
+            if (this.bgm.isPaused == true) {
+                this.sound.resume('levelbgm');
+            }
+            else {
+                this.bgm.play();
+            }
         }
 
         this.player = this.physics.add.image(100, 410, "player");
