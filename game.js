@@ -14,7 +14,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('introlevel1');
+        this.scene.start('introlevel3');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -633,6 +633,9 @@ class IntroLevel2 extends Phaser.Scene {
             this.player.setVelocityX(0);
         })
 
+        this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
+        this.itemdesc.setAlpha(0);
+
         this.physics.add.overlap(this.player, this.doodle, () => {
             if (this.doodle.found == false) {
                 this.doodle.found = true;
@@ -641,7 +644,7 @@ class IntroLevel2 extends Phaser.Scene {
                     this.sound.play('itemFound');
                 }
             }
-            this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
+            this.itemdesc.setAlpha(1);
             this.tweens.add({
                 targets: this.itemdesc,
                 alpha: 0,
@@ -656,7 +659,7 @@ class IntroLevel2 extends Phaser.Scene {
         this.settings.on('pointerdown', () => {
             this.bgm.pause();
             this.scene.sleep(this.key);
-            this.scene.start('settingsingame', {prevKey: 'introlevel1'});
+            this.scene.start('settingsingame', {prevKey: 'introlevel2'});
         })
 
     }
@@ -696,14 +699,149 @@ class IntroLevel3 extends Phaser.Scene {
         super('introlevel3');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
+        this.load.image('doodle', 'objects/doodle.png');
+        this.load.image('branch', 'objects/treebranch.png');
+        this.load.image('trunk', 'objects/trunk.png');
+        this.load.image('portal', 'objects/portal.png');
+    }
     create() {
         this.add.text(50, 100, "intro to finding past items to delve deeper into past, very basic gameplay");
-        this.input.once("pointerdown", () => {
-           this.scene.start('mainlevel1');
+        this.totalItems = 0;
+        this.itemsFound = 0;
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+        this.bgm = this.sound.add('levelbgm');
+
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.05);
+        this.player.setCollideWorldBounds(true);
+
+        this.portal = this.physics.add.image(700, 350, 'portal');
+        this.portal.setScale(0.1);
+        this.portal.body.allowGravity = false;
+        this.portal.body.setImmovable(true);
+
+        this.leveldesc = this.add.text(100, 50, "\"The area looks the same as usual... and yet it's a lot stranger...\"", {wordWrap: {width: 600}});
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 0,
+            duration: 3000,
+        });
+        
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.doodle = this.add.existing(new PastItem(this, 400, 400, 'doodle', 'An old doodle from a few years ago of a somewhat familiar character. How did that get here?'));
+        this.doodle.setScale(0.05);
+
+        this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
+        this.leftButton.setAngle(270);
+        this.leftButton.on("pointerdown", () => {
+            this.player.setVelocityX(-150);
+            //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
+            this.player.flipX = true;
         })
+        this.leftButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.upButton = this.add.existing(new Button(this, 725, 525, 'arrowButton'));
+        this.upButton.on("pointerdown", () => {
+            this.player.setVelocityY(-250);
+        });
+
+        this.rightButton = this.add.existing(new Button(this, 250, 525, 'arrowButton'));
+        this.rightButton.setAngle(90);
+        this.rightButton.on("pointerdown", () => {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        })
+        this.rightButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
+        this.itemdesc.setAlpha(0);
+
+        this.physics.add.overlap(this.player, this.doodle, () => {
+            if (this.doodle.found == false) {
+                this.doodle.found = true;
+                this.itemsFound++;
+                if (muteSFX == false) {
+                    this.sound.play('itemFound');
+                }
+            }
+            this.itemdesc.setAlpha(1);
+            this.tweens.add({
+                targets: this.itemdesc,
+                alpha: 0,
+                duration: 3000,
+                delay: 1000,
+            });
+        });
+
+        this.physics.add.collider(this.player, this.ground);
+        
+        this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
+        this.settings.on('pointerdown', () => {
+            this.bgm.pause();
+            this.scene.sleep(this.key);
+            this.scene.start('settingsingame', {prevKey: 'introlevel3'});
+        });
+
+        this.physics.add.overlap(this.player, this.portal, () => {
+            if(this.itemsFound == this.totalItems) {
+                this.scene.start('mainlevel1');
+            }
+            else {
+                this.portaldesc = this.add.text(100, 100, "This portal seems to lead further into the past. Maybe if you ge more in tune with your past, you can go through...", {wordWrap: {width: 600}});
+            }
+
+            this.tweens.add({
+                targets: this.portaldesc,
+                alpha: 0,
+                duration: 3000,
+                delay: 1000,
+            });
+        });
     }
-    update() {}
+    update() {
+        const { left, right, up } = this.cursors;
+        if (left.isDown) {
+            this.player.setVelocityX(-150);
+            this.player.flipX = true;
+        }
+        else if (right.isDown) {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        }
+
+        left.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+        right.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+        if (up.isDown && this.player.body.touching.down) {
+            this.player.setVelocityY(-250);
+        }
+    }
 
 }
 
