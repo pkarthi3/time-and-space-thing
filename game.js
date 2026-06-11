@@ -15,7 +15,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('mainlevel1');
+        this.scene.start('introlevel1');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -528,7 +528,7 @@ class IntroLevel1 extends Phaser.Scene {
         }
 
         if (this.player.x > 750) {
-            this.scene.start('introlevel2');
+            this.scene.start('mainlevel1');
         }
 
         if (this.bgm.isPaused) {
@@ -602,7 +602,6 @@ class IntroLevel2 extends Phaser.Scene {
         this.load.image("player", "player.png"); 
         this.load.image("doodle", "objects/doodle.png");
         this.load.image("ground", "ground.png");
-        this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
         this.load.audio('itemFound', 'itemfound.wav');
         this.load.image('arrowButton', 'arrowButton.png');
@@ -618,7 +617,8 @@ class IntroLevel2 extends Phaser.Scene {
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
 
-        this.bgm = this.sound.add('levelbgm');
+        let first = this.scene.get('introlevel1');
+        this.bgm = first.sound.get('levelbgm');
 
         this.itemSFX = this.sound.add('itemFound');
         this.itemSFX.setVolume(0.5);
@@ -739,6 +739,11 @@ class IntroLevel2 extends Phaser.Scene {
         if (this.player.x > 750) {
             this.scene.start('introlevel3');
         }
+
+        if (this.bgm.isPaused) {
+            this.bgm.resume();
+        }
+    
         
     }
 
@@ -753,7 +758,6 @@ class IntroLevel3 extends Phaser.Scene {
         this.load.path = "assets/";
         this.load.image("player", "player.png"); 
         this.load.image("ground", "ground.png");
-        this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
         this.load.image('arrowButton', 'arrowButton.png');
         this.load.image('settingsButton', 'settingsButton.png');
@@ -773,7 +777,8 @@ class IntroLevel3 extends Phaser.Scene {
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
 
-        this.bgm = this.sound.add('levelbgm');
+        let first = this.scene.get('introlevel1');
+        this.bgm = first.sound.get('levelbgm');
 
         this.itemSFX = this.sound.add('itemFound');
         this.itemSFX.setVolume(0.5);
@@ -939,6 +944,11 @@ class IntroLevel3 extends Phaser.Scene {
         if (up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-250);
         }
+
+        if (this.bgm.isPaused) {
+            this.bgm.resume();
+        }
+    
     }
 
 }
@@ -952,7 +962,6 @@ class MainLevel1 extends Phaser.Scene {
         this.load.path = "assets/";
         this.load.image("player", "player.png"); 
         this.load.image("ground", "ground.png");
-        this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
         this.load.image('arrowButton', 'arrowButton.png');
         this.load.image('settingsButton', 'settingsButton.png');
@@ -976,6 +985,8 @@ class MainLevel1 extends Phaser.Scene {
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
 
+        let first = this.scene.get('introlevel1');
+        this.bgm = first.sound.get('levelbgm');
 
         this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.2, 0xB0E4F7);
 
@@ -1119,6 +1130,11 @@ class MainLevel1 extends Phaser.Scene {
         if (up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-250);
         }
+
+        if (this.bgm.isPaused) {
+            this.bgm.resume();
+        }
+
     }
 
 }
@@ -1132,7 +1148,6 @@ class MainLevel2 extends Phaser.Scene {
         this.load.path = "assets/";
         this.load.image("player", "player.png"); 
         this.load.image("ground", "ground.png");
-        this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
         this.load.image('arrowButton', 'arrowButton.png');
         this.load.image('settingsButton', 'settingsButton.png');
@@ -1143,12 +1158,19 @@ class MainLevel2 extends Phaser.Scene {
         this.load.audio('portalSFX', 'nextarea.flac');
     }
     create() {
+        let first = this.scene.get('introlevel1');
+        this.bgm = first.sound.get('levelbgm');
         this.add.text(100, 100, "gameplay: more complex object placements with obstacles");
         this.input.once("pointerdown", () => {
            this.scene.start('mainlevel3');
         })
     }
-    update() {}
+    update() {
+        if (this.bgm.isPaused) {
+            this.bgm.resume();
+        }
+    }
+
 
 }
 
@@ -1173,6 +1195,8 @@ class MainLevel3 extends Phaser.Scene {
         this.load.audio('portalSFX', 'nextarea.flac');
     }
     create() {
+        let first = this.scene.get('introlevel1');
+        this.bgm = first.sound.get('levelbgm');
         this.add.text(100, 100, "gameplay: many objects placed in complex spots");
         this.input.once("pointerdown", () => {
            this.scene.start('finallevel');
@@ -1200,6 +1224,10 @@ class MainLevel3 extends Phaser.Scene {
 
         if (up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-250);
+        }
+
+        if (this.bgm.isPaused) {
+            this.bgm.resume();
         }
     }
 
