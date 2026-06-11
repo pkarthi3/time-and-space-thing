@@ -1,6 +1,8 @@
-let viewedOpening = false;
-let muteMusic = false;
-let muteSFX = false;
+let viewedOpening = true;
+// based on solution at https://www.slingacademy.com/article/saving-user-preferences-and-applying-them-to-the-dom-with-javascript/
+let muteMusic = localStorage.getItem('muteMusic');
+let muteSFX = localStorage.getItem('muteSFX');
+console.log(muteMusic);
 
 class Logo extends Phaser.Scene {
     constructor() {
@@ -12,7 +14,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('introlevel2');
+        this.scene.start('menu');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -56,19 +58,21 @@ class Menu extends Phaser.Scene {
         this.menubg.setScale(1.1);
 
         this.menumusic = this.sound.add('menumusic');
-        if (muteMusic){
-            this.menumusic.setMute();
-        }
-        else {
-            if (this.menumusic.isPlaying == false){
-                if(this.menumusic.isPaused == true){
-                    this.menumusic.resume();
-                }
-                else {
-                    this.menumusic.play();
-                }
+        if (this.menumusic.isPlaying == false && muteMusic == false){
+            if(this.menumusic.isPaused == true){
+                this.menumusic.resume();
+            }
+            else {
+                this.menumusic.play();
             }
         }
+        if (muteMusic == true){
+            this.menumusic.setMute(true);
+        }
+        else {
+            this.menumusic.setMute(false);
+        }
+        
         this.logo = this.add.image(550, 150, "logo");
         this.logo.setScale(0.4);
         this.sideRect = this.add.rectangle(-400, 300, 400, 600, 0x447182, 1);
@@ -240,7 +244,7 @@ class Settings extends Phaser.Scene {
     preload() {}
     create() {
         this.add.rectangle(400, 300, 800, 600, 0x447182);
-        this.fsbutton = this.add.existing(new MenuButton(this, 200, 300));
+        this.fsbutton = this.add.existing(new MenuButton(this, 400, 300));
         this.fsbutton.on('pointerdown', () => {
             if(this.scale.isFullscreen) {
                 this.scale.stopFullscreen();
@@ -249,26 +253,29 @@ class Settings extends Phaser.Scene {
                 this.scale.startFullscreen();
             }
         })
-        this.fslabel = this.add.text(150, 300, 'fullscreen');
+        this.fslabel = this.add.text(350, 300, 'Fullscreen');
 
-        this.mutebutton = this.add.existing(new MenuButton(this, 200, 100));
+        this.mutebutton = this.add.existing(new MenuButton(this, 400, 100));
         this.mutebutton.on('pointerdown', () => {
             muteMusic = !muteMusic;
+            localStorage.setItem('muteMusic', muteMusic);
+            console.log(muteMusic);
         });
-        this.add.text(100, 100, "mute music");
+        this.add.text(350, 100, "Mute Music");
 
         
-        this.sfxbutton = this.add.existing(new MenuButton(this, 200, 200));
+        this.sfxbutton = this.add.existing(new MenuButton(this, 400, 200));
         this.sfxbutton.on('pointerdown', () => {
             muteSFX = !muteSFX;
+            localStorage.setItem('muteSFX', muteSFX);
         });
-        this.add.text(100, 200, "mute SFX");
+        this.add.text(350, 200, "Mute SFX");
 
-        this.toMenu = this.add.text(100, 500, "back");
-        this.toMenu.setInteractive();
-        this.toMenu.on('pointerdown', () => {
+        this.menuButton = this.add.existing(new MenuButton(this, 150, 500));
+        this.menuButton.on('pointerdown', () => {
             this.scene.start('menu');
         })
+        this.toMenu = this.add.text(130, 500, "Back");
     }
     update() {}
 }
@@ -283,7 +290,7 @@ class Credits extends Phaser.Scene {
         this.add.rectangle(400, 300, 800, 600, 0x447182);
         this.add.text(150, 100, "credits go here");
         this.menuButton = this.add.existing(new MenuButton(this, 175, 500));
-        this.toMenu = this.add.text(100, 500, "back");
+        this.toMenu = this.add.text(130, 500, "Back");
         this.menuButton.on('pointerdown', () => {
             this.scene.start('menu');
         });
@@ -505,23 +512,7 @@ class SettingsIngame extends Phaser.Scene {
     preload() {}
     create() {
         this.add.rectangle(400, 300, 800, 600, 0x447182);
-        this.add.text(100, 100, "settings go here");
-
-        this.back = this.add.text(500, 500, "back");
-        this.back.setInteractive();
-        this.back.on('pointerdown', () => {
-            this.scene.run(this.prevKey);
-            this.scene.stop('settingsingame');
-        });
-
-        this.toMenu = this.add.text(100, 500, "to main menu");
-        this.toMenu.setInteractive();
-        this.toMenu.on('pointerdown', () => {
-            this.scene.stop(this.prevKey);
-            this.scene.start('menu');
-        });
-
-        this.fsbutton = this.add.existing(new MenuButton(this, 200, 300));
+        this.fsbutton = this.add.existing(new MenuButton(this, 400, 300));
         this.fsbutton.on('pointerdown', () => {
             if(this.scale.isFullscreen) {
                 this.scale.stopFullscreen();
@@ -530,7 +521,36 @@ class SettingsIngame extends Phaser.Scene {
                 this.scale.startFullscreen();
             }
         })
-        this.fslabel = this.add.text(150, 300, 'fullscreen');
+        this.fslabel = this.add.text(350, 300, 'Fullscreen');
+
+        this.mutebutton = this.add.existing(new MenuButton(this, 400, 100));
+        this.mutebutton.on('pointerdown', () => {
+            muteMusic = !muteMusic;
+            localStorage.setItem('muteMusic', muteMusic);
+            console.log(muteMusic);
+        });
+        this.add.text(350, 100, "Mute Music");
+
+        
+        this.sfxbutton = this.add.existing(new MenuButton(this, 400, 200));
+        this.sfxbutton.on('pointerdown', () => {
+            muteSFX = !muteSFX;
+            localStorage.setItem('muteSFX', muteSFX);
+        });
+        this.add.text(350, 200, "Mute SFX");
+
+        this.menuButton = this.add.existing(new MenuButton(this, 150, 500));
+        this.menuButton.on('pointerdown', () => {
+            this.scene.start('menu');
+        })
+        this.toMenu = this.add.text(115, 500, "To Menu");
+
+        this.back = this.add.existing(new MenuButton(this, 650, 500));
+        this.back.on('pointerdown', () => {
+            this.scene.run(this.prevKey);
+            this.scene.stop('settingsingame');
+        });
+        this.backText = this.add.text(630, 500, "Back");
     }
     
 }
