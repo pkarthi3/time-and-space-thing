@@ -1769,9 +1769,57 @@ class Ending2 extends Phaser.Scene {
         super('ending2');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.image('forest', 'forestbg.jpg');
+    }
     create() {
         this.add.text(50, 100, "character avoids their past self, \naccepts that they'll always be running away and stays in the past");
+
+        this.vignette = this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.4, 0xB0E4F7);
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+        this.player = this.physics.add.image(700, 390, "player");
+        this.player.setScale(0.075);
+        this.player.flipX = true;
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.leveldesc = this.add.text(100, 50, "\"It really is embarrassing seeing how I've changed since then, especially since even with how embarrassing I used to be, I've only gotten much worse.\"", {wordWrap: {width: 600}});
+        this.leveldesc.setAlpha(0);
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 1,
+            duration: 1000,
+        });
+        this.leveldesc = this.add.text(100, 100, "\"At least if I stay here in the past, I won't have the chance to keep embarrassing myself.\"", {wordWrap: {width: 600}});
+        this.leveldesc.setAlpha(0);
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 1,
+            duration: 1000,
+            delay: 3000
+        });
+
+        this.physics.add.collider(this.player, this.ground);
+
+        this.tweens.add({
+            targets: this.vignette,
+            strength: 0,
+            duration: 1000,
+            delay: 8000,
+        })
+
+        this.time.delayedCall(8000, () => {
+            this.cameras.main.fadeOut();
+        })
+
     }
     update() {}
 
