@@ -9,3 +9,4 @@
 - assets/objects: all images in the folder created by Pavithra Karthikeyan in IbisPaintX
 - assets/player.png: created by Pavithra Karthikeyan in IbisPaintX
 - assets/ground.png: created by Pavithra Karthikeyan in Krita
+- assets/introcutscene.mp4: created by Pavithra Karthikeyan in Adobe Premiere, background of video is forestbg.jpg, footsteps audio is from a recording by Pavithra Karthikeyan

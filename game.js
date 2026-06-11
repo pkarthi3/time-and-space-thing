@@ -1,5 +1,5 @@
 let viewedOpening = false;
-let muteMusic = true;
+let muteMusic = false;
 let muteSFX = false;
 
 class Logo extends Phaser.Scene {
@@ -12,7 +12,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('introlevel1');
+        this.scene.start('introlevel2');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -253,11 +253,16 @@ class Settings extends Phaser.Scene {
 
         this.mutebutton = this.add.existing(new MenuButton(this, 200, 100));
         this.mutebutton.on('pointerdown', () => {
-            muteMusic = true;
+            muteMusic = !muteMusic;
         });
-        this.add.text(100, 100, "mute music?");
+        this.add.text(100, 100, "mute music");
 
-        this.fslabel = this.add.text(150, 300, 'fullscreen');
+        
+        this.sfxbutton = this.add.existing(new MenuButton(this, 200, 200));
+        this.sfxbutton.on('pointerdown', () => {
+            muteSFX = !muteSFX;
+        });
+        this.add.text(100, 200, "mute SFX");
 
         this.toMenu = this.add.text(100, 500, "back");
         this.toMenu.setInteractive();
@@ -393,7 +398,7 @@ class IntroLevel1 extends Phaser.Scene {
         this.bgm = this.sound.add('levelbgm');
         this.bgm.setLoop(true);
         if (muteMusic == true){
-            this.bgm.setMute();
+            this.bgm.setMute(true);
         }
         else {
             if (this.bgm.isPaused == true) {
@@ -408,7 +413,7 @@ class IntroLevel1 extends Phaser.Scene {
         this.player.setScale(0.035);
         this.player.setCollideWorldBounds(true);
 
-        this.leveldesc = this.add.text(100, 50, "Doing this always puts my mind at ease...");
+        this.leveldesc = this.add.text(100, 50, "\"Doing this always puts my mind at ease...\"");
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
@@ -512,6 +517,7 @@ class SettingsIngame extends Phaser.Scene {
         this.toMenu = this.add.text(100, 500, "to main menu");
         this.toMenu.setInteractive();
         this.toMenu.on('pointerdown', () => {
+            this.scene.stop(this.prevKey);
             this.scene.start('menu');
         });
 
@@ -550,6 +556,8 @@ class IntroLevel2 extends Phaser.Scene {
 
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
+
+        this.bgm = this.sound.add('levelbgm');
 
         this.player = this.physics.add.image(100, 410, "player");
         this.player.setScale(0.035);
@@ -599,7 +607,9 @@ class IntroLevel2 extends Phaser.Scene {
             if (this.doodle.found == false) {
                 this.doodle.found = true;
                 this.itemsFound++;
-                this.sound.play('itemFound');
+                if (muteSFX == false) {
+                    this.sound.play('itemFound');
+                }
             }
             this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
             this.tweens.add({
