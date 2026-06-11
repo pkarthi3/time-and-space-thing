@@ -340,6 +340,17 @@ class PastItem extends Phaser.GameObjects.Image {
     }
 }
 
+class Branch extends Phaser.GameObjects.Image {
+    constructor(scene, x, y) {
+        super(scene, x, y, 'branch');
+        scene.physics.world.enable(this);
+        this.body.setSize(this.body.width, this.body.halfHeight);
+        this.setScale(0.15);
+        this.body.allowGravity = false;
+        this.body.setImmovable(true);
+    }
+}
+
 class MenuButton extends Phaser.GameObjects.Rectangle {
     constructor(scene, x, y) {
         super(scene, x, y, 200, 50, 0x94B9C7);
@@ -582,6 +593,8 @@ class IntroLevel2 extends Phaser.Scene {
         this.totalItems = 0;
         this.itemsFound = 0;
 
+        this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.1, 0xB0E4F7);
+
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
 
@@ -709,27 +722,47 @@ class IntroLevel3 extends Phaser.Scene {
         this.load.image('settingsButton', 'settingsButton.png');
         this.load.image('doodle', 'objects/doodle.png');
         this.load.image('branch', 'objects/treebranch.png');
-        this.load.image('trunk', 'objects/trunk.png');
+        this.load.image('trunk', 'objects/treetrunk.png');
         this.load.image('portal', 'objects/portal.png');
     }
     create() {
-        this.add.text(50, 100, "intro to finding past items to delve deeper into past, very basic gameplay");
         this.totalItems = 0;
         this.itemsFound = 0;
+
+        this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.15, 0xB0E4F7);
 
         this.menubg = this.add.image(400, 100, 'forest');
         this.menubg.setScale(1.1);
 
         this.bgm = this.sound.add('levelbgm');
 
-        this.player = this.physics.add.image(100, 410, "player");
-        this.player.setScale(0.05);
-        this.player.setCollideWorldBounds(true);
 
-        this.portal = this.physics.add.image(700, 350, 'portal');
+        this.portal = this.physics.add.image(700, 225, 'portal');
         this.portal.setScale(0.1);
         this.portal.body.allowGravity = false;
         this.portal.body.setImmovable(true);
+
+        
+        this.trunk = this.add.image(300, 300, 'trunk');
+        this.trunk.setScale(0.5);
+        
+        this.branch = this.add.existing(new Branch(this, 425, 350));
+        this.branch.flipX = true;
+
+        this.branch2 = this.add.existing(new Branch(this, 200, 250));
+
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.doodle = this.add.existing(new PastItem(this, 50, 200, 'doodle', 'Another old doodle. It seems to feature a character that you don\'t care for all that much, and it\'s fairly rough.'));
+        this.doodle.setScale(0.05);
+
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.05);
+        this.player.setCollideWorldBounds(true);
 
         this.leveldesc = this.add.text(100, 50, "\"The area looks the same as usual... and yet it's a lot stranger...\"", {wordWrap: {width: 600}});
         this.tweens.add({
@@ -738,14 +771,6 @@ class IntroLevel3 extends Phaser.Scene {
             duration: 3000,
         });
         
-        this.cursors = this.input.keyboard.createCursorKeys();
-
-        this.ground = this.physics.add.image(400, 600, "ground");
-        this.ground.body.allowGravity = false;
-        this.ground.body.setImmovable(true);
-
-        this.doodle = this.add.existing(new PastItem(this, 400, 400, 'doodle', 'An old doodle from a few years ago of a somewhat familiar character. How did that get here?'));
-        this.doodle.setScale(0.05);
 
         this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
         this.leftButton.setAngle(270);
@@ -794,6 +819,8 @@ class IntroLevel3 extends Phaser.Scene {
         });
 
         this.physics.add.collider(this.player, this.ground);
+        this.physics.add.collider(this.player, this.branch);
+        this.physics.add.collider(this.player, this.branch2);
         
         this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
         this.settings.on('pointerdown', () => {
@@ -804,10 +831,14 @@ class IntroLevel3 extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.portal, () => {
             if(this.itemsFound == this.totalItems) {
-                this.scene.start('mainlevel1');
+                this.add.text(100, 50, "You travel deeper into the past...");
+                this.cameras.main.fadeOut();
+                this.time.delayedCall(1500, () => {
+                    this.scene.start('mainlevel1');
+                });
             }
             else {
-                this.portaldesc = this.add.text(100, 100, "This portal seems to lead further into the past. Maybe if you ge more in tune with your past, you can go through...", {wordWrap: {width: 600}});
+                this.portaldesc = this.add.text(100, 50, "This portal seems to lead into the past. Maybe if you get more in tune with your past, you can go through...", {wordWrap: {width: 600}});
             }
 
             this.tweens.add({
