@@ -481,7 +481,7 @@ class IntroLevel1 extends Phaser.Scene {
         this.settings.on('pointerdown', () => {
             this.bgm.pause();
             this.scene.sleep(this.key);
-            this.scene.start('settingsingame', {prevKey: 'introlevel1'});
+            this.scene.launch('settingsingame', {prevKey: 'introlevel1'});
         })
 
         
@@ -672,7 +672,7 @@ class IntroLevel2 extends Phaser.Scene {
         this.settings.on('pointerdown', () => {
             this.bgm.pause();
             this.scene.sleep(this.key);
-            this.scene.start('settingsingame', {prevKey: 'introlevel2'});
+            this.scene.launch('settingsingame', {prevKey: 'introlevel2'});
         })
 
     }
@@ -826,7 +826,7 @@ class IntroLevel3 extends Phaser.Scene {
         this.settings.on('pointerdown', () => {
             this.bgm.pause();
             this.scene.sleep(this.key);
-            this.scene.start('settingsingame', {prevKey: 'introlevel3'});
+            this.scene.launch('settingsingame', {prevKey: 'introlevel3'});
         });
 
         this.physics.add.overlap(this.player, this.portal, () => {
