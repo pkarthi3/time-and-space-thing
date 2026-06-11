@@ -15,7 +15,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('introlevel1');
+        this.scene.start('mainlevel1');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -956,6 +956,7 @@ class MainLevel1 extends Phaser.Scene {
         this.load.image('forest', 'forestbg.jpg');
         this.load.image('arrowButton', 'arrowButton.png');
         this.load.image('settingsButton', 'settingsButton.png');
+        this.load.image('pins', 'objects/pins.png');
         this.load.image('branch', 'objects/treebranch.png');
         this.load.image('trunk', 'objects/treetrunk.png');
         this.load.image('portal', 'objects/portal.png');
@@ -963,12 +964,162 @@ class MainLevel1 extends Phaser.Scene {
         this.load.audio('portalSFX', 'nextarea.flac');
     }
     create() {
+
+        this.totalItems = 0;
+        this.itemsFound = 0;
+
+
         this.add.text(100, 100, "gameplay: basic object placements");
-        this.input.once("pointerdown", () => {
-           this.scene.start('mainlevel2');
+
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+
+        this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.2, 0xB0E4F7);
+
+        this.itemSFX = this.sound.add('itemFound');
+        this.itemSFX.setVolume(0.5);
+        if (muteSFX == true) {
+            this.itemSFX.setMute(true);
+        }
+        else {
+            this.itemSFX.setMute(false);
+        }
+
+        this.trunk = this.add.image(300, 300, 'trunk');
+        this.trunk.setScale(0.5);
+        
+        this.branch = this.add.existing(new Branch(this, 425, 350));
+        this.branch.flipX = true;
+
+        this.branch5 = this.add.existing(new Branch(this, 425, 150));
+        this.branch5.flipX = true;
+
+        this.branch2 = this.add.existing(new Branch(this, 200, 250));
+
+        this.trunk2 = this.add.image(800, 300, 'trunk');
+        this.trunk2.setScale(0.5);
+        
+        this.branch3 = this.add.existing(new Branch(this, 925, 350));
+        this.branch3.flipX = true;
+
+        this.branch4 = this.add.existing(new Branch(this, 700, 250));
+
+        this.pins = this.add.existing(new PastItem(this, 50, 200, 'pins', 'Pins from some old event you went to. You remember being thrilled to get these, but as of now you don\'t think much of them.'));
+        this.pins.setScale(0.05);
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.leveldesc = this.add.text(100, 50, "\"Well, a change of pace is a change of pace... Hopefully all of this ends up paying off.\"", {wordWrap: {width: 600}});
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 0,
+            duration: 3000,
+        });
+        
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.05);
+        this.player.setCollideWorldBounds(true);
+
+        this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
+        this.leftButton.setAngle(270);
+        this.leftButton.on("pointerdown", () => {
+            this.player.setVelocityX(-150);
+            //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
+            this.player.flipX = true;
         })
+        this.leftButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.upButton = this.add.existing(new Button(this, 725, 525, 'arrowButton'));
+        this.upButton.on("pointerdown", () => {
+            this.player.setVelocityY(-250);
+        });
+
+        this.rightButton = this.add.existing(new Button(this, 250, 525, 'arrowButton'));
+        this.rightButton.setAngle(90);
+        this.rightButton.on("pointerdown", () => {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        })
+        this.rightButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        
+        this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
+        this.settings.on('pointerdown', () => {
+            this.bgm.pause();
+            this.scene.sleep(this.key);
+            this.scene.launch('settingsingame', {prevKey: 'mainlevel1'});
+        });
+
+        this.physics.add.collider(this.player, this.ground);
+        this.physics.add.collider(this.player, this.branch);
+        this.physics.add.collider(this.player, this.branch2);
+        this.physics.add.collider(this.player, this.branch3);
+        this.physics.add.collider(this.player, this.branch4);
+        this.physics.add.collider(this.player, this.branch5);
+
+        this.itemdesc = this.add.text(100, 50, this.pins.description,  {wordWrap: {width: 600}});
+        this.itemdesc.setAlpha(0);
+        this.sfxDesc = this.add.text(this.pins.x - 50, this.pins.y - 50, '*picks up item*');
+        this.sfxDesc.setAlpha(0);
+
+        this.physics.add.overlap(this.player, this.pins, () => {
+            if (this.pins.found == false) {
+                this.pins.found = true;
+                this.itemsFound++;
+                this.itemSFX.play();
+            }
+            this.itemdesc.setAlpha(1);
+            this.sfxDesc.setAlpha(1);
+            this.tweens.add({
+                targets: this.sfxDesc,
+                alpha: 0,
+                duration: 500,
+                delay: 500,
+            });
+            this.tweens.add({
+                targets: this.itemdesc,
+                alpha: 0,
+                duration: 3000,
+                delay: 1000,
+            });
+        });
+
+
+
     }
-    update() {}
+    update() { 
+        const { left, right, up } = this.cursors;
+        if (left.isDown) {
+            this.player.setVelocityX(-150);
+            this.player.flipX = true;
+        }
+        else if (right.isDown) {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        }
+
+        left.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+        right.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+        if (up.isDown && this.player.body.touching.down) {
+            this.player.setVelocityY(-250);
+        }
+    }
 
 }
 
@@ -1027,7 +1178,30 @@ class MainLevel3 extends Phaser.Scene {
            this.scene.start('finallevel');
         })
     }
-    update() {}
+    update() {
+         const { left, right, up } = this.cursors;
+        if (left.isDown) {
+            this.player.setVelocityX(-150);
+            this.player.flipX = true;
+        }
+        else if (right.isDown) {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        }
+
+        left.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+        right.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+        if (up.isDown && this.player.body.touching.down) {
+            this.player.setVelocityY(-250);
+        }
+    }
 
 }
 
@@ -1056,7 +1230,30 @@ class FinalLevel extends Phaser.Scene {
             this.scene.start('ending2');
         })
     }
-    update() {}
+    update() {
+         const { left, right, up } = this.cursors;
+        if (left.isDown) {
+            this.player.setVelocityX(-150);
+            this.player.flipX = true;
+        }
+        else if (right.isDown) {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        }
+
+        left.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+        right.on("up", () => {
+            this.player.setVelocityX(0);
+        })
+
+
+        if (up.isDown && this.player.body.touching.down) {
+            this.player.setVelocityY(-250);
+        }
+    }
 }
 
 class Ending1 extends Phaser.Scene {
