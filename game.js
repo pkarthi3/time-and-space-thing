@@ -15,7 +15,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('introlevel1');
+        this.scene.start('mainlevel1');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -59,14 +59,8 @@ class Menu extends Phaser.Scene {
         this.menubg.setScale(1.1);
 
         this.menumusic = this.sound.add('menumusic');
-        if (this.menumusic.isPlaying == false && muteMusic == false){
-            if(this.menumusic.isPaused == true){
-                this.menumusic.resume();
-            }
-            else {
-                this.menumusic.play();
-            }
-        }
+        this.menumusic.setVolume(0.5);
+        this.menumusic.play();
         if (muteMusic == true){
             this.menumusic.setMute(true);
         }
@@ -450,7 +444,7 @@ class IntroLevel1 extends Phaser.Scene {
         this.player.setScale(0.05);
         this.player.setCollideWorldBounds(true);
 
-        this.leveldesc = this.add.text(100, 50, "\"Doing this always puts my mind at ease...\"");
+        this.leveldesc = this.add.text(100, 50, "\"Going out for a walk like this always puts my mind at ease...\"",  {wordWrap: {width: 600}});
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
@@ -528,7 +522,7 @@ class IntroLevel1 extends Phaser.Scene {
         }
 
         if (this.player.x > 750) {
-            this.scene.start('mainlevel1');
+            this.scene.start('introlevel2');
         }
 
         if (this.bgm.isPaused) {
@@ -685,15 +679,15 @@ class IntroLevel2 extends Phaser.Scene {
                 this.doodle.found = true;
                 this.itemsFound++;
                 this.itemSFX.play();
+                this.sfxDesc.setAlpha(1);
+                this.tweens.add({
+                    targets: this.sfxDesc,
+                    alpha: 0,
+                    duration: 500,
+                    delay: 500,
+                });
             }
             this.itemdesc.setAlpha(1);
-            this.sfxDesc.setAlpha(1);
-            this.tweens.add({
-                targets: this.sfxDesc,
-                alpha: 0,
-                duration: 500,
-                delay: 500,
-            });
             this.tweens.add({
                 targets: this.itemdesc,
                 alpha: 0,
@@ -825,7 +819,7 @@ class IntroLevel3 extends Phaser.Scene {
         this.player.setScale(0.05);
         this.player.setCollideWorldBounds(true);
 
-        this.leveldesc = this.add.text(100, 50, "\"The area looks the same as usual... and yet it's a lot stranger...\"", {wordWrap: {width: 600}});
+        this.leveldesc = this.add.text(100, 50, "\"The area looks the same as usual... and yet it's a lot stranger, judging by what looks like some sort of rift in time...\"", {wordWrap: {width: 600}});
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
@@ -871,15 +865,15 @@ class IntroLevel3 extends Phaser.Scene {
                 this.doodle.found = true;
                 this.itemsFound++;
                 this.itemSFX.play();
+                this.sfxDesc.setAlpha(1);
+                this.tweens.add({
+                    targets: this.sfxDesc,
+                    alpha: 0,
+                    duration: 500,
+                    delay: 500,
+                });
             }
             this.itemdesc.setAlpha(1);
-            this.sfxDesc.setAlpha(1);
-            this.tweens.add({
-                targets: this.sfxDesc,
-                alpha: 0,
-                duration: 500,
-                delay: 500,
-            });
             this.tweens.add({
                 targets: this.itemdesc,
                 alpha: 0,
@@ -901,6 +895,7 @@ class IntroLevel3 extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.portal, () => {
             if(this.itemsFound == this.totalItems) {
+                this.portal.disableBody();
                 this.add.text(100, 50, "You travel deeper into the past...");
                 this.portalSFX.play();
                 this.portalsfxDesc.setAlpha(1);
@@ -910,7 +905,7 @@ class IntroLevel3 extends Phaser.Scene {
                 });
             }
             else {
-                this.portaldesc = this.add.text(100, 50, "This portal seems to lead into the past. Maybe if you get more in tune with your past, you can go through...", {wordWrap: {width: 600}});
+                this.portaldesc = this.add.text(100, 50, "This portal seems to lead further into the past. Maybe if you get more in tune with your past, you can go through...", {wordWrap: {width: 600}});
             }
 
             this.tweens.add({
@@ -966,6 +961,7 @@ class MainLevel1 extends Phaser.Scene {
         this.load.image('arrowButton', 'arrowButton.png');
         this.load.image('settingsButton', 'settingsButton.png');
         this.load.image('pins', 'objects/pins.png');
+        this.load.image('merchshirt', 'objects/merchshirt.png');
         this.load.image('branch', 'objects/treebranch.png');
         this.load.image('trunk', 'objects/treetrunk.png');
         this.load.image('portal', 'objects/portal.png');
@@ -988,7 +984,7 @@ class MainLevel1 extends Phaser.Scene {
         let first = this.scene.get('introlevel1');
         this.bgm = first.sound.get('levelbgm');
 
-        this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.2, 0xB0E4F7);
+        this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.25, 0xB0E4F7);
 
         this.itemSFX = this.sound.add('itemFound');
         this.itemSFX.setVolume(0.5);
@@ -997,6 +993,15 @@ class MainLevel1 extends Phaser.Scene {
         }
         else {
             this.itemSFX.setMute(false);
+        }
+
+        this.portalSFX = this.sound.add('portalSFX');
+        this.portalSFX.setVolume(0.2);
+        if (muteSFX == true) {
+            this.portalSFX.setMute(true);
+        }
+        else {
+            this.portalSFX.setMute(false);
         }
 
         this.trunk = this.add.image(300, 300, 'trunk');
@@ -1021,16 +1026,26 @@ class MainLevel1 extends Phaser.Scene {
         this.pins = this.add.existing(new PastItem(this, 50, 200, 'pins', 'Pins from some old event you went to. You remember being thrilled to get these, but as of now you don\'t think much of them.'));
         this.pins.setScale(0.05);
 
+        this.merchshirt = this.add.existing(new PastItem(this, 400, 100, 'merchshirt', 'A shirt featuring that character you doodled earlier, likely from an event. Were they some favorite to you?'));
+        this.merchshirt.setScale(0.05);
+
         this.ground = this.physics.add.image(400, 600, "ground");
         this.ground.body.allowGravity = false;
         this.ground.body.setImmovable(true);
 
-        this.leveldesc = this.add.text(100, 50, "\"Well, a change of pace is a change of pace... Hopefully all of this ends up paying off.\"", {wordWrap: {width: 600}});
+        this.leveldesc = this.add.text(100, 50, "\"\"", {wordWrap: {width: 600}});
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
             duration: 3000,
         });
+
+         
+        this.portal = this.physics.add.image(700, 350, 'portal');
+        this.portal.setScale(0.1);
+        this.portal.body.allowGravity = false;
+        this.portal.body.setImmovable(true);
+
         
         this.player = this.physics.add.image(100, 410, "player");
         this.player.setScale(0.05);
@@ -1079,23 +1094,29 @@ class MainLevel1 extends Phaser.Scene {
 
         this.itemdesc = this.add.text(100, 50, this.pins.description,  {wordWrap: {width: 600}});
         this.itemdesc.setAlpha(0);
+        this.itemdesc2 = this.add.text(100, 50, this.merchshirt.description,  {wordWrap: {width: 600}});
+        this.itemdesc2.setAlpha(0);
         this.sfxDesc = this.add.text(this.pins.x - 50, this.pins.y - 50, '*picks up item*');
         this.sfxDesc.setAlpha(0);
+        this.sfxDesc2 = this.add.text(this.merchshirt.x - 75, this.merchshirt.y + 30, '*picks up item*');
+        this.sfxDesc2.setAlpha(0);
+        this.portalsfxDesc = this.add.text(this.portal.x - 75, this.portal.y - 100, '*cartoon warp sfx*');
+        this.portalsfxDesc.setAlpha(0)
 
         this.physics.add.overlap(this.player, this.pins, () => {
             if (this.pins.found == false) {
                 this.pins.found = true;
                 this.itemsFound++;
                 this.itemSFX.play();
+                this.sfxDesc.setAlpha(1);
+                this.tweens.add({
+                    targets: this.sfxDesc,
+                    alpha: 0,
+                    duration: 500,
+                    delay: 500,
+                });
             }
             this.itemdesc.setAlpha(1);
-            this.sfxDesc.setAlpha(1);
-            this.tweens.add({
-                targets: this.sfxDesc,
-                alpha: 0,
-                duration: 500,
-                delay: 500,
-            });
             this.tweens.add({
                 targets: this.itemdesc,
                 alpha: 0,
@@ -1104,7 +1125,50 @@ class MainLevel1 extends Phaser.Scene {
             });
         });
 
+         this.physics.add.overlap(this.player, this.merchshirt, () => {
+            if (this.merchshirt.found == false) {
+                this.merchshirt.found = true;
+                this.itemsFound++;
+                this.itemSFX.play();
+                this.sfxDesc2.setAlpha(1);
+                this.tweens.add({
+                    targets: this.sfxDesc2,
+                    alpha: 0,
+                    duration: 500,
+                    delay: 500,
+                });
+            }
+            this.itemdesc2.setAlpha(1);
+            this.tweens.add({
+                targets: this.itemdesc2,
+                alpha: 0,
+                duration: 3000,
+                delay: 1000,
+            });
+        });
 
+        this.physics.add.overlap(this.player, this.portal, () => {
+            if(this.itemsFound == this.totalItems) {
+                this.portal.disableBody();
+                this.add.text(100, 50, "You travel deeper into the past...");
+                this.portalSFX.play();
+                this.portalsfxDesc.setAlpha(1);
+                this.cameras.main.fadeOut();
+                this.time.delayedCall(1500, () => {
+                    this.scene.start('mainlevel2');
+                });
+            }
+            else {
+                this.portaldesc = this.add.text(100, 50, "This portal seems to lead further into the past. Maybe if you get more in tune with your past, you can go through...", {wordWrap: {width: 600}});
+            }
+
+            this.tweens.add({
+                targets: this.portaldesc,
+                alpha: 0,
+                duration: 3000,
+                delay: 1000,
+            });
+        });
 
     }
     update() { 
@@ -1131,9 +1195,11 @@ class MainLevel1 extends Phaser.Scene {
             this.player.setVelocityY(-250);
         }
 
-        if (this.bgm.isPaused) {
+
+        /* if (this.bgm.isPaused) {
             this.bgm.resume();
         }
+        */
 
     }
 
@@ -1161,49 +1227,43 @@ class MainLevel2 extends Phaser.Scene {
         let first = this.scene.get('introlevel1');
         this.bgm = first.sound.get('levelbgm');
         this.add.text(100, 100, "gameplay: more complex object placements with obstacles");
-        this.input.once("pointerdown", () => {
-           this.scene.start('mainlevel3');
+        this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
+        this.leftButton.setAngle(270);
+        this.leftButton.on("pointerdown", () => {
+            this.player.setVelocityX(-150);
+            //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
+            this.player.flipX = true;
         })
+        this.leftButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.upButton = this.add.existing(new Button(this, 725, 525, 'arrowButton'));
+        this.upButton.on("pointerdown", () => {
+            this.player.setVelocityY(-250);
+        });
+
+        this.rightButton = this.add.existing(new Button(this, 250, 525, 'arrowButton'));
+        this.rightButton.setAngle(90);
+        this.rightButton.on("pointerdown", () => {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        })
+        this.rightButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        
+        this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
+        this.settings.on('pointerdown', () => {
+            this.bgm.pause();
+            this.scene.sleep(this.key);
+            this.scene.launch('settingsingame', {prevKey: 'mainlevel2'});
+        });
+
     }
     update() {
-        if (this.bgm.isPaused) {
-            this.bgm.resume();
-        }
-    }
-
-
-}
-
-class MainLevel3 extends Phaser.Scene {
-    constructor() {
-        super('mainlevel3');
-    }
-
-    preload() {
-        this.load.path = "assets/";
-        this.load.image("player", "player.png"); 
-        this.load.image("ground", "ground.png");
-        this.load.audio("levelbgm", "levelbg.wav");
-        this.load.image('forest', 'forestbg.jpg');
-        this.load.image('arrowButton', 'arrowButton.png');
-        this.load.image('settingsButton', 'settingsButton.png');
-        this.load.image('doodle', 'objects/doodle.png');
-        this.load.image('branch', 'objects/treebranch.png');
-        this.load.image('trunk', 'objects/treetrunk.png');
-        this.load.image('portal', 'objects/portal.png');
-        this.load.audio('itemFound', 'itemfound.wav');
-        this.load.audio('portalSFX', 'nextarea.flac');
-    }
-    create() {
-        let first = this.scene.get('introlevel1');
-        this.bgm = first.sound.get('levelbgm');
-        this.add.text(100, 100, "gameplay: many objects placed in complex spots");
-        this.input.once("pointerdown", () => {
-           this.scene.start('finallevel');
-        })
-    }
-    update() {
-         const { left, right, up } = this.cursors;
+        const { left, right, up } = this.cursors;
         if (left.isDown) {
             this.player.setVelocityX(-150);
             this.player.flipX = true;
@@ -1225,11 +1285,11 @@ class MainLevel3 extends Phaser.Scene {
         if (up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-250);
         }
-
-        if (this.bgm.isPaused) {
+        /*if (this.bgm.isPaused) {
             this.bgm.resume();
-        }
+        }*/
     }
+
 
 }
 
@@ -1330,7 +1390,7 @@ let config = {
             debug: true,
         }
     },
-    scene: [Logo, Menu, Settings, SettingsIngame, Credits, Intro, IntroLevel1, IntroLevel2, IntroLevel3, MainLevel1, MainLevel2, MainLevel3, FinalLevel, Ending1, Ending2],
+    scene: [Logo, Menu, Settings, SettingsIngame, Credits, Intro, IntroLevel1, IntroLevel2, IntroLevel3, MainLevel1, MainLevel2, FinalLevel, Ending1, Ending2],
 }
 
 let game = new Phaser.Game(config);
