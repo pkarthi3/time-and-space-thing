@@ -15,7 +15,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('intro');
+        this.scene.start('introlevel1');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -442,13 +442,9 @@ class IntroLevel1 extends Phaser.Scene {
             this.bgm.setMute(true);
         }
         else {
-            if (this.bgm.isPaused == true) {
-                this.sound.resume('levelbgm');
-            }
-            else {
-                this.bgm.play();
-            }
+            this.bgm.setMute(false);
         }
+        this.bgm.play();
 
         this.player = this.physics.add.image(100, 410, "player");
         this.player.setScale(0.05);
@@ -533,6 +529,10 @@ class IntroLevel1 extends Phaser.Scene {
 
         if (this.player.x > 750) {
             this.scene.start('introlevel2');
+        }
+
+        if (this.bgm.isPaused) {
+            this.bgm.resume();
         }
     
     }
@@ -620,6 +620,15 @@ class IntroLevel2 extends Phaser.Scene {
 
         this.bgm = this.sound.add('levelbgm');
 
+        this.itemSFX = this.sound.add('itemFound');
+        this.itemSFX.setVolume(0.5);
+        if (muteSFX == true) {
+            this.itemSFX.setMute(true);
+        }
+        else {
+            this.itemSFX.setMute(false);
+        }
+
         this.player = this.physics.add.image(100, 410, "player");
         this.player.setScale(0.05);
         this.player.setCollideWorldBounds(true);
@@ -668,16 +677,23 @@ class IntroLevel2 extends Phaser.Scene {
 
         this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
         this.itemdesc.setAlpha(0);
+        this.sfxDesc = this.add.text(this.doodle.x - 50, this.doodle.y - 50, '*picks up item*');
+        this.sfxDesc.setAlpha(0);
 
         this.physics.add.overlap(this.player, this.doodle, () => {
             if (this.doodle.found == false) {
                 this.doodle.found = true;
                 this.itemsFound++;
-                if (muteSFX == false) {
-                    this.sound.play('itemFound');
-                }
+                this.itemSFX.play();
             }
             this.itemdesc.setAlpha(1);
+            this.sfxDesc.setAlpha(1);
+            this.tweens.add({
+                targets: this.sfxDesc,
+                alpha: 0,
+                duration: 500,
+                delay: 500,
+            });
             this.tweens.add({
                 targets: this.itemdesc,
                 alpha: 0,
@@ -723,6 +739,7 @@ class IntroLevel2 extends Phaser.Scene {
         if (this.player.x > 750) {
             this.scene.start('introlevel3');
         }
+        
     }
 
 }
@@ -744,6 +761,8 @@ class IntroLevel3 extends Phaser.Scene {
         this.load.image('branch', 'objects/treebranch.png');
         this.load.image('trunk', 'objects/treetrunk.png');
         this.load.image('portal', 'objects/portal.png');
+        this.load.audio('itemFound', 'itemfound.wav');
+        this.load.audio('portalSFX', 'nextarea.flac');
     }
     create() {
         this.totalItems = 0;
@@ -756,6 +775,23 @@ class IntroLevel3 extends Phaser.Scene {
 
         this.bgm = this.sound.add('levelbgm');
 
+        this.itemSFX = this.sound.add('itemFound');
+        this.itemSFX.setVolume(0.5);
+        if (muteSFX == true) {
+            this.itemSFX.setMute(true);
+        }
+        else {
+            this.itemSFX.setMute(false);
+        }
+
+        this.portalSFX = this.sound.add('portalSFX');
+        this.portalSFX.setVolume(0.2);
+        if (muteSFX == true) {
+            this.portalSFX.setMute(true);
+        }
+        else {
+            this.portalSFX.setMute(false);
+        }
 
         this.portal = this.physics.add.image(700, 225, 'portal');
         this.portal.setScale(0.1);
@@ -820,16 +856,25 @@ class IntroLevel3 extends Phaser.Scene {
 
         this.itemdesc = this.add.text(100, 50, this.doodle.description,  {wordWrap: {width: 600}});
         this.itemdesc.setAlpha(0);
+        this.sfxDesc = this.add.text(this.doodle.x - 50, this.doodle.y - 50, '*picks up item*');
+        this.sfxDesc.setAlpha(0);
+        this.portalsfxDesc = this.add.text(this.portal.x - 75, this.portal.y - 100, '*cartoon warp sfx*');
+        this.portalsfxDesc.setAlpha(0);
 
         this.physics.add.overlap(this.player, this.doodle, () => {
             if (this.doodle.found == false) {
                 this.doodle.found = true;
                 this.itemsFound++;
-                if (muteSFX == false) {
-                    this.sound.play('itemFound');
-                }
+                this.itemSFX.play();
             }
             this.itemdesc.setAlpha(1);
+            this.sfxDesc.setAlpha(1);
+            this.tweens.add({
+                targets: this.sfxDesc,
+                alpha: 0,
+                duration: 500,
+                delay: 500,
+            });
             this.tweens.add({
                 targets: this.itemdesc,
                 alpha: 0,
@@ -852,6 +897,8 @@ class IntroLevel3 extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.portal, () => {
             if(this.itemsFound == this.totalItems) {
                 this.add.text(100, 50, "You travel deeper into the past...");
+                this.portalSFX.play();
+                this.portalsfxDesc.setAlpha(1);
                 this.cameras.main.fadeOut();
                 this.time.delayedCall(1500, () => {
                     this.scene.start('mainlevel1');
@@ -901,7 +948,20 @@ class MainLevel1 extends Phaser.Scene {
         super('mainlevel1');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
+        this.load.image('branch', 'objects/treebranch.png');
+        this.load.image('trunk', 'objects/treetrunk.png');
+        this.load.image('portal', 'objects/portal.png');
+        this.load.audio('itemFound', 'itemfound.wav');
+        this.load.audio('portalSFX', 'nextarea.flac');
+    }
     create() {
         this.add.text(100, 100, "gameplay: basic object placements");
         this.input.once("pointerdown", () => {
@@ -917,7 +977,20 @@ class MainLevel2 extends Phaser.Scene {
         super('mainlevel2');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
+        this.load.image('branch', 'objects/treebranch.png');
+        this.load.image('trunk', 'objects/treetrunk.png');
+        this.load.image('portal', 'objects/portal.png');
+        this.load.audio('itemFound', 'itemfound.wav');
+        this.load.audio('portalSFX', 'nextarea.flac');
+    }
     create() {
         this.add.text(100, 100, "gameplay: more complex object placements with obstacles");
         this.input.once("pointerdown", () => {
@@ -933,7 +1006,21 @@ class MainLevel3 extends Phaser.Scene {
         super('mainlevel3');
     }
 
-    preload() {}
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
+        this.load.image('doodle', 'objects/doodle.png');
+        this.load.image('branch', 'objects/treebranch.png');
+        this.load.image('trunk', 'objects/treetrunk.png');
+        this.load.image('portal', 'objects/portal.png');
+        this.load.audio('itemFound', 'itemfound.wav');
+        this.load.audio('portalSFX', 'nextarea.flac');
+    }
     create() {
         this.add.text(100, 100, "gameplay: many objects placed in complex spots");
         this.input.once("pointerdown", () => {
@@ -949,7 +1036,16 @@ class FinalLevel extends Phaser.Scene {
         super('finallevel');
     }
 
-    preload() {}
+    preload() {this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.audio("levelbgm", "levelbg.wav");
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
+        this.load.image('doodle', 'objects/doodle.png');
+        this.load.image('portal', 'objects/portal.png');
+        this.load.audio('itemFound', 'itemfound.wav');
+        this.load.audio('portalSFX', 'nextarea.flac');}
     create() {
         this.add.text(50, 100, "plays out like normal level at first, but \ncharacter has to confront younger self");
         this.add.text(100, 200, "press 1 for ending 1, press 2 for ending 2");
