@@ -14,7 +14,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('menu');
+        this.scene.start('introlevel1');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -319,10 +319,11 @@ class Intro extends Phaser.Scene {
     update() {}
 }
 
-class Button extends Phaser.GameObjects.Text {
-     constructor(scene, x, y, text) {
-        super(scene, x, y, text);
-        this.setFontSize(50);
+class Button extends Phaser.GameObjects.Image {
+     constructor(scene, x, y, texture) {
+        super(scene, x, y, texture);
+        this.setAlpha(0.7);
+        this.setScale(0.2);
         this.setInteractive();
      }       
 }
@@ -391,6 +392,8 @@ class IntroLevel1 extends Phaser.Scene {
         this.load.image("ground", "ground.png");
         this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
         
     }
     create() {
@@ -417,7 +420,7 @@ class IntroLevel1 extends Phaser.Scene {
         }
 
         this.player = this.physics.add.image(100, 410, "player");
-        this.player.setScale(0.035);
+        this.player.setScale(0.05);
         this.player.setCollideWorldBounds(true);
 
         this.leveldesc = this.add.text(100, 50, "\"Doing this always puts my mind at ease...\"");
@@ -433,7 +436,8 @@ class IntroLevel1 extends Phaser.Scene {
         this.ground.body.allowGravity = false;
         this.ground.body.setImmovable(true);
 
-        this.leftButton = this.add.existing(new Button(this, 50, 500, "<"));
+        this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
+        this.leftButton.setAngle(270);
         this.leftButton.on("pointerdown", () => {
             this.player.setVelocityX(-150);
             //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
@@ -443,12 +447,13 @@ class IntroLevel1 extends Phaser.Scene {
             this.player.setVelocityX(0);
         })
 
-        this.upButton = this.add.existing(new Button(this, 650, 500, "^"));
+        this.upButton = this.add.existing(new Button(this, 725, 525, 'arrowButton'));
         this.upButton.on("pointerdown", () => {
             this.player.setVelocityY(-250);
         });
 
-        this.rightButton = this.add.existing(new Button(this, 150, 500, ">"));
+        this.rightButton = this.add.existing(new Button(this, 250, 525, 'arrowButton'));
+        this.rightButton.setAngle(90);
         this.rightButton.on("pointerdown", () => {
             this.player.setVelocityX(150);
             this.player.flipX = false;
@@ -460,7 +465,8 @@ class IntroLevel1 extends Phaser.Scene {
 
 
         this.physics.add.collider(this.player, this.ground);
-        this.settings = this.add.existing(new Button(this, 500, 0, "settings"));
+
+        this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
         this.settings.on('pointerdown', () => {
             this.bgm.pause();
             this.scene.sleep(this.key);
@@ -568,6 +574,8 @@ class IntroLevel2 extends Phaser.Scene {
         this.load.audio("levelbgm", "levelbg.wav");
         this.load.image('forest', 'forestbg.jpg');
         this.load.audio('itemFound', 'itemfound.wav');
+        this.load.image('arrowButton', 'arrowButton.png');
+        this.load.image('settingsButton', 'settingsButton.png');
         
     }
     create() {
@@ -580,7 +588,7 @@ class IntroLevel2 extends Phaser.Scene {
         this.bgm = this.sound.add('levelbgm');
 
         this.player = this.physics.add.image(100, 410, "player");
-        this.player.setScale(0.035);
+        this.player.setScale(0.05);
         this.player.setCollideWorldBounds(true);
 
         this.leveldesc = this.add.text(100, 50, "\"Maybe I'm too at ease... Did I maybe wander into the wrong parts of the forest?\"", {wordWrap: {width: 600}});
@@ -596,7 +604,11 @@ class IntroLevel2 extends Phaser.Scene {
         this.ground.body.allowGravity = false;
         this.ground.body.setImmovable(true);
 
-        this.leftButton = this.add.existing(new Button(this, 50, 500, "<"));
+        this.doodle = this.add.existing(new PastItem(this, 400, 400, 'doodle', 'An old doodle from a few years ago of a somewhat familiar character. How did that get here?'));
+        this.doodle.setScale(0.05);
+
+        this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
+        this.leftButton.setAngle(270);
         this.leftButton.on("pointerdown", () => {
             this.player.setVelocityX(-150);
             //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
@@ -606,15 +618,13 @@ class IntroLevel2 extends Phaser.Scene {
             this.player.setVelocityX(0);
         })
 
-        this.doodle = this.add.existing(new PastItem(this, 400, 400, 'doodle', 'An old doodle from a few years ago of a somewhat familiar character. How did that get here?'));
-        this.doodle.setScale(0.05);
-
-        this.upButton = this.add.existing(new Button(this, 650, 500, "^"));
+        this.upButton = this.add.existing(new Button(this, 725, 525, 'arrowButton'));
         this.upButton.on("pointerdown", () => {
             this.player.setVelocityY(-250);
         });
 
-        this.rightButton = this.add.existing(new Button(this, 150, 500, ">"));
+        this.rightButton = this.add.existing(new Button(this, 250, 525, 'arrowButton'));
+        this.rightButton.setAngle(90);
         this.rightButton.on("pointerdown", () => {
             this.player.setVelocityX(150);
             this.player.flipX = false;
@@ -641,12 +651,14 @@ class IntroLevel2 extends Phaser.Scene {
         });
 
         this.physics.add.collider(this.player, this.ground);
-        this.settings = this.add.existing(new Button(this, 500, 0, "settings"));
+        
+        this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
         this.settings.on('pointerdown', () => {
             this.bgm.pause();
             this.scene.sleep(this.key);
-            this.scene.start('settingsingame', {prevKey: 'introlevel2'});
+            this.scene.start('settingsingame', {prevKey: 'introlevel1'});
         })
+
     }
     update() {
         const { left, right, up } = this.cursors;

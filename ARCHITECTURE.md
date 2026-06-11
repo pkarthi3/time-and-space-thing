@@ -1,9 +1,10 @@
 ```mermaid
 classDiagram
-    Phaser.GameObjects.Text <|-- Button
+    Phaser.GameObjects.Image <|-- Button
     Phaser.GameObjects.Image <|-- PastItem
     class Button {
-        Button : setFontSize()
+        Button : setAlpha(0.7)
+        Button : setScale(0.2)
         Button : setInteractive()
     }
     
