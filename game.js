@@ -1193,10 +1193,10 @@ class MainLevel1 extends Phaser.Scene {
         }
 
 
-        /* if (this.bgm.isPaused) {
+        if (this.bgm.isPaused) {
             this.bgm.resume();
         }
-        */
+        
 
     }
 
@@ -1360,7 +1360,7 @@ class MainLevel2 extends Phaser.Scene {
         
         this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
         this.settings.on('pointerdown', () => {
-            //this.bgm.pause();
+            this.bgm.pause();
             this.scene.sleep(this.key);
             this.scene.launch('settingsingame', {prevKey: 'mainlevel2'});
         });
@@ -1492,9 +1492,9 @@ class MainLevel2 extends Phaser.Scene {
         if (up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-250);
         }
-        /*if (this.bgm.isPaused) {
+        if (this.bgm.isPaused) {
             this.bgm.resume();
-        }*/
+        }
     }
 
 
@@ -1542,6 +1542,8 @@ class FinalLevel extends Phaser.Scene {
 
         this.younger = this.physics.add.image(550, 400, "player-younger");
         this.younger.setScale(0.06);
+        this.younger.body.allowGravity = false;
+        this.younger.body.setImmovable(true);
 
         this.portal = this.physics.add.image(75, 350, 'portal');
         this.portal.setScale(0.1);
@@ -1575,6 +1577,9 @@ class FinalLevel extends Phaser.Scene {
             duration: 1000,
             delay: 6000,
         });
+
+        this.portalsfxDesc = this.add.text(this.portal.x - 75, this.portal.y + 100, '*cartoon warp sfx*');
+        this.portalsfxDesc.setAlpha(0);
 
         this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
         this.leftButton.setAngle(270);
@@ -1661,10 +1666,99 @@ class Ending1 extends Phaser.Scene {
     }
 
     preload() {
-        
+        this.load.path = "assets/";
+        this.load.image("player", "player.png"); 
+        this.load.image("ground", "ground.png");
+        this.load.image('portal', 'objects/portal.png');
+        this.load.image('player-younger', 'objects/player-younger.png');
+        this.load.image('forest', 'forestbg.jpg');
+        this.load.audio('bgm', 'menubg.wav');
     }
     create() {
-        this.add.text(50, 100, "character accepts their past self, decides to move forward in the present");
+
+        this.cameras.main.fadeIn();
+
+        this.vignette = this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.35, 0xB0E4F7);
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+        this.bgm = this.sound.add('bgm');
+        this.bgm.setVolume(0.5);
+        this.bgm.play();
+        if (muteMusic == true){
+            this.bgm.setMute(true);
+        }
+        else {
+            this.bgm.setMute(false);
+        }
+
+
+        this.leveldesc = this.add.text(100, 50, "\"The least I can do after all this is to not just turn away from who I was again.\"", {wordWrap: {width: 600}});
+        this.leveldesc.setAlpha(0);
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 1,
+            duration: 1000,
+        });
+        this.leveldesc = this.add.text(100, 100, "\"After all, despite how much I've changed, this is still me. All else I can do is to move forward while keeping in mind how I didn't mind stepping out of the background back then.\"", {wordWrap: {width: 600}});
+        this.leveldesc.setAlpha(0);
+        this.tweens.add({
+            targets: this.leveldesc,
+            alpha: 1,
+            duration: 1000,
+            delay: 3000
+        });
+
+        this.portal = this.physics.add.image(75, 350, 'portal');
+        this.portal.setScale(0.1);
+        this.portal.body.allowGravity = false;
+        this.portal.body.setImmovable(true);
+
+        this.player = this.physics.add.image(485, 390, "player");
+        this.player.setScale(0.075);
+        this.younger = this.physics.add.image(550, 400, "player-younger");
+        this.younger.setScale(0.06);
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.physics.add.collider(this.player, this.ground);
+        this.physics.add.collider(this.younger, this.ground);
+
+        this.tweens.add({
+            targets: [this.younger, this.portal],
+            alpha: 0,
+            duration: 1000,
+            delay: 8000,
+        })
+        this.tweens.add({
+            targets: this.vignette,
+            strength: 0,
+            duration: 2000,
+            delay: 8000,
+        })
+
+        this.tweens.add({
+            targets: this.player,
+            x: 1000,
+            duration: 3000,
+            delay: 12000,
+        })
+
+        
+        this.tweens.add({
+            targets: this.bgm,
+            volume: 0,
+            duration: 3000,
+            delay: 12000,
+        })
+
+        this.time.delayedCall(14000, () => {
+            this.cameras.main.fadeOut();
+        })
+        
     }
     update() {}
 
