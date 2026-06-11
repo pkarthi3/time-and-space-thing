@@ -3,6 +3,7 @@ let viewedOpening = true;
 let muteMusic = localStorage.getItem('muteMusic');
 let muteSFX = localStorage.getItem('muteSFX');
 console.log(muteMusic);
+console.log(muteSFX);
 
 class Logo extends Phaser.Scene {
     constructor() {
@@ -14,7 +15,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('introlevel3');
+        this.scene.start('intro');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -312,9 +313,28 @@ class Intro extends Phaser.Scene {
         this.introVideo = this.add.video(400, 300, 'introcutscene');
         this.introVideo.setScale(0.7);
         this.introVideo.play();
-        this.time.delayedCall(17000, () => {
-           this.scene.start('introlevel1');
-        })
+        if (muteSFX == true) {
+            this.introVideo.setMute(true);
+        }
+        else{
+            this.introVideo.setMute(false);
+        }
+        this.caption = this.add.text(350, 500, '*footsteps*');
+        this.caption.setAlpha(0);
+        this.introVideo.on('unlocked', () => {
+            this.tweens.add({
+            targets: this.caption,
+            alpha: 1,
+            delay: 5000,
+            ease: 'Quint.easeIn',
+            });
+        });
+        this.introVideo.on('complete', () => {
+           this.cameras.main.fadeOut();
+           this.time.delayedCall(1000, () => {
+            this.scene.start('introlevel1');
+           });
+        });
     }
     update() {}
 }
