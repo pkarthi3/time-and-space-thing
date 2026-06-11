@@ -15,7 +15,7 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('mainlevel1');
+        this.scene.start('mainlevel2');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -819,7 +819,7 @@ class IntroLevel3 extends Phaser.Scene {
         this.player.setScale(0.05);
         this.player.setCollideWorldBounds(true);
 
-        this.leveldesc = this.add.text(100, 50, "\"The area looks the same as usual... and yet it's a lot stranger, judging by what looks like some sort of rift in time...\"", {wordWrap: {width: 600}});
+        this.leveldesc = this.add.text(100, 50, "\"The area looks the same as usual, but at the same time it feels a lot stranger. Hopefully whatever I've gotten myself into ends up being worth it in the end.\"", {wordWrap: {width: 600}});
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
@@ -973,9 +973,6 @@ class MainLevel1 extends Phaser.Scene {
         this.totalItems = 0;
         this.itemsFound = 0;
 
-
-        this.add.text(100, 100, "gameplay: basic object placements");
-
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.menubg = this.add.image(400, 100, 'forest');
@@ -1033,7 +1030,7 @@ class MainLevel1 extends Phaser.Scene {
         this.ground.body.allowGravity = false;
         this.ground.body.setImmovable(true);
 
-        this.leveldesc = this.add.text(100, 50, "\"\"", {wordWrap: {width: 600}});
+        this.leveldesc = this.add.text(100, 50, "\"Why is the forest littered with things I hardly remember anyway? It's all just embarrassing in the end. I guess the same could be said about a lot of my current things, though...\"", {wordWrap: {width: 600}});
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
@@ -1227,6 +1224,87 @@ class MainLevel2 extends Phaser.Scene {
         let first = this.scene.get('introlevel1');
         this.bgm = first.sound.get('levelbgm');
         this.add.text(100, 100, "gameplay: more complex object placements with obstacles");
+
+        this.cameras.main.filters.external.addVignette(0.5, 0.5, 1, 0.3, 0xB0E4F7);
+
+        this.itemSFX = this.sound.add('itemFound');
+        this.itemSFX.setVolume(0.5);
+        if (muteSFX == true) {
+            this.itemSFX.setMute(true);
+        }
+        else {
+            this.itemSFX.setMute(false);
+        }
+
+        this.portalSFX = this.sound.add('portalSFX');
+        this.portalSFX.setVolume(0.2);
+        if (muteSFX == true) {
+            this.portalSFX.setMute(true);
+        }
+        else {
+            this.portalSFX.setMute(false);
+        
+        }
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
+
+        this.trunk = this.add.image(0, 225, 'trunk');
+        this.trunk.setScale(0.35);
+
+        this.trunk = this.add.image(300, 225, 'trunk');
+        this.trunk.setScale(0.35);
+
+        this.trunk = this.add.image(700, 225, 'trunk');
+        this.trunk.setScale(0.35);
+
+        this.branches = this.physics.add.staticGroup();
+        this.branch = this.add.existing(new Branch(this, 400, 300));
+        this.branch.flipX = true;
+        this.branch.setScale(0.1);
+        this.branch2 = this.add.existing(new Branch(this, 250, 200));
+        this.branch2.setScale(0.1);
+        this.branch3 = this.add.existing(new Branch(this, 625, 175));
+        this.branch3.setScale(0.1);
+        this.branch4 = this.add.existing(new Branch(this, 775, 275));
+        this.branch4.flipX = true;
+        this.branch4.setScale(0.1);
+        this.branch5 = this.add.existing(new Branch(this, 600, 375));
+        this.branch5.setScale(0.1);
+        this.branch6 = this.add.existing(new Branch(this, 100, 350));
+        this.branch6.flipX = true;
+        this.branch6.setScale(0.1);
+        this.branch7 = this.add.existing(new Branch(this, 75, 150));
+        this.branch7.flipX = true;
+        this.branch7.setScale(0.1);
+        this.branch8 = this.add.existing(new Branch(this, 400, 85));
+        this.branch8.flipX = true;
+
+        this.branches.add(this.branch);
+        this.branches.add(this.branch2);
+        this.branches.add(this.branch3);
+        this.branches.add(this.branch4);
+        this.branches.add(this.branch5);
+        this.branches.add(this.branch6);
+        this.branches.add(this.branch7);
+        this.branches.add(this.branch8);
+
+
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.05);
+        this.player.setCollideWorldBounds(true);
+
+        this.portal = this.physics.add.image(75, 75, 'portal');
+        this.portal.setScale(0.1);
+        this.portal.body.allowGravity = false;
+        this.portal.body.setImmovable(true);
+        
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
         this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
         this.leftButton.setAngle(270);
         this.leftButton.on("pointerdown", () => {
@@ -1256,10 +1334,13 @@ class MainLevel2 extends Phaser.Scene {
         
         this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
         this.settings.on('pointerdown', () => {
-            this.bgm.pause();
+            //this.bgm.pause();
             this.scene.sleep(this.key);
             this.scene.launch('settingsingame', {prevKey: 'mainlevel2'});
         });
+
+        this.physics.add.collider(this.player, this.ground);
+        this.physics.add.collider(this.player, this.branches);
 
     }
     update() {
@@ -1311,12 +1392,60 @@ class FinalLevel extends Phaser.Scene {
     create() {
         this.add.text(50, 100, "plays out like normal level at first, but \ncharacter has to confront younger self");
         this.add.text(100, 200, "press 1 for ending 1, press 2 for ending 2");
+        this.menubg = this.add.image(400, 100, 'forest');
+        this.menubg.setScale(1.1);
         this.input.keyboard.on('keydown-ONE', () => {
             this.scene.start('ending1');
         })
         this.input.keyboard.on('keydown-TWO', () => {
             this.scene.start('ending2');
         })
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+
+        this.player = this.physics.add.image(100, 410, "player");
+        this.player.setScale(0.05);
+        this.player.setCollideWorldBounds(true);
+
+        this.ground = this.physics.add.image(400, 600, "ground");
+        this.ground.body.allowGravity = false;
+        this.ground.body.setImmovable(true);
+
+        this.leftButton = this.add.existing(new Button(this, 100, 525, 'arrowButton'));
+        this.leftButton.setAngle(270);
+        this.leftButton.on("pointerdown", () => {
+            this.player.setVelocityX(-150);
+            //based off solution at https://labs.phaser.io/phaser4-view.html?src=src%5Ctransform%5Cflip%20x.js&return=phaser4-index.html%3Fpath%3Daudio%252FWeb%2520Audio
+            this.player.flipX = true;
+        })
+        this.leftButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        this.upButton = this.add.existing(new Button(this, 725, 525, 'arrowButton'));
+        this.upButton.on("pointerdown", () => {
+            this.player.setVelocityY(-250);
+        });
+
+        this.rightButton = this.add.existing(new Button(this, 250, 525, 'arrowButton'));
+        this.rightButton.setAngle(90);
+        this.rightButton.on("pointerdown", () => {
+            this.player.setVelocityX(150);
+            this.player.flipX = false;
+        })
+        this.rightButton.on("pointerup", () => {
+            this.player.setVelocityX(0);
+        })
+
+        
+        this.settings = this.add.existing(new Button(this, 750, 50, 'settingsButton'));
+        this.settings.on('pointerdown', () => {
+            this.bgm.pause();
+            this.scene.sleep(this.key);
+            this.scene.launch('settingsingame', {prevKey: 'mainlevel2'});
+        });
+
+        this.physics.add.collider(this.player, this.ground);
     }
     update() {
          const { left, right, up } = this.cursors;
