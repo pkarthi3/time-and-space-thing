@@ -1,9 +1,8 @@
-let viewedOpening = true;
+let viewedOpening = false;
 // based on solution at https://www.slingacademy.com/article/saving-user-preferences-and-applying-them-to-the-dom-with-javascript/
-let muteMusic = localStorage.getItem('muteMusic');
-let muteSFX = localStorage.getItem('muteSFX');
+let muteMusic = localStorage.getItem('muteMusic') || false;
 console.log(muteMusic);
-console.log(muteSFX);
+let muteSFX = localStorage.getItem('muteSFX') || false;
 
 class Logo extends Phaser.Scene {
     constructor() {
@@ -15,7 +14,6 @@ class Logo extends Phaser.Scene {
         this.load.image('logotext', 'sillytextnew.png');
     }
     create() {
-        this.scene.start('finallevel');
         this.sillyguy = this.add.image(400, 200, "guy");
         this.sillyguy.setScale(0.001);
         this.tweens.add({
@@ -60,13 +58,11 @@ class Menu extends Phaser.Scene {
 
         this.menumusic = this.sound.add('menumusic');
         this.menumusic.setVolume(0.5);
-        this.menumusic.play();
         if (muteMusic == true){
-            this.menumusic.setMute(true);
+            this.menumusic.setVolume(0);
         }
-        else {
-            this.menumusic.setMute(false);
-        }
+        
+        this.menumusic.play();
         
         this.logo = this.add.image(550, 150, "logo");
         this.logo.setScale(0.4);
@@ -254,7 +250,6 @@ class Settings extends Phaser.Scene {
         this.mutebutton.on('pointerdown', () => {
             muteMusic = !muteMusic;
             localStorage.setItem('muteMusic', muteMusic);
-            console.log(muteMusic);
         });
         this.add.text(350, 100, "Mute Music");
 
@@ -283,7 +278,13 @@ class Credits extends Phaser.Scene {
     preload() {}
     create() {
         this.add.rectangle(400, 300, 800, 600, 0x447182);
-        this.add.text(150, 100, "credits go here");
+        this.add.text(150, 50, "Code by Pavithra Karthikeyan");
+        this.add.text(150, 100, "Forest background by Takeshi Ishikawa on Vecteezy");
+        this.add.text(150, 150, "Other visual assets by Pavithra Karthikeyan");
+        this.add.text(150, 200, "Menu/ending music by rhodesmas on Freesound");
+        this.add.text(150, 250, "Level music by FoolBoyMedia on Freesound");
+        this.add.text(150, 300, "Item pickup sound effect by BeezleFM on Freesound");
+        this.add.text(150, 350, "Portal sound effect by qubodup on Freesound");
         this.menuButton = this.add.existing(new MenuButton(this, 175, 500));
         this.toMenu = this.add.text(130, 500, "Back");
         this.menuButton.on('pointerdown', () => {
@@ -308,14 +309,11 @@ class Intro extends Phaser.Scene {
         this.introVideo.setScale(0.7);
         this.introVideo.play();
         if (muteSFX == true) {
-            this.introVideo.setMute(true);
-        }
-        else{
-            this.introVideo.setMute(false);
+            this.introVideo.setVolume(0);
         }
         this.caption = this.add.text(350, 500, '*footsteps*');
         this.caption.setAlpha(0);
-        this.introVideo.on('unlocked', () => {
+        this.introVideo.on('play', () => {
             this.tweens.add({
             targets: this.caption,
             alpha: 1,
@@ -823,7 +821,7 @@ class IntroLevel3 extends Phaser.Scene {
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
-            duration: 3000,
+            duration: 5000,
         });
         
 
@@ -1034,7 +1032,7 @@ class MainLevel1 extends Phaser.Scene {
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
-            duration: 3000,
+            duration: 5000,
         });
 
          
@@ -1324,7 +1322,7 @@ class MainLevel2 extends Phaser.Scene {
         this.tweens.add({
             targets: this.leveldesc,
             alpha: 0,
-            duration: 3000,
+            duration: 5000,
         });
 
         this.ground = this.physics.add.image(400, 600, "ground");
@@ -1453,6 +1451,7 @@ class MainLevel2 extends Phaser.Scene {
                 this.portalsfxDesc.setAlpha(1);
                 this.cameras.main.fadeOut();
                 this.time.delayedCall(1500, () => {
+                    this.bgm.stop();
                     this.scene.start('finallevel');
                 });
             }
@@ -1684,13 +1683,13 @@ class Ending1 extends Phaser.Scene {
         this.menubg.setScale(1.1);
 
         this.bgm = this.sound.add('bgm');
-        this.bgm.setVolume(0.5);
-        this.bgm.play();
+        this.bgm.setVolume(0.2);
         if (muteMusic == true){
             this.bgm.setMute(true);
         }
         else {
             this.bgm.setMute(false);
+            this.bgm.play();
         }
 
 
@@ -1842,7 +1841,7 @@ let config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 300 },
-            debug: true,
+            debug: false,
         }
     },
     scene: [Logo, Menu, Settings, SettingsIngame, Credits, Intro, IntroLevel1, IntroLevel2, IntroLevel3, MainLevel1, MainLevel2, FinalLevel, Ending1, Ending2],
